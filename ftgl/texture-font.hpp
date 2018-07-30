@@ -8,7 +8,11 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string>
 #include "texture-atlas.hpp"
+
+typedef struct FT_LibraryRec_ *FT_Library;
+typedef struct FT_FaceRec_ *FT_Face;
 
 namespace ftgl
 {
@@ -37,14 +41,14 @@ namespace ftgl
 /**
  * A list of possible ways to render a glyph.
  */
-typedef enum rendermode_t
+enum rendermode_t
 {
     RENDER_NORMAL,
     RENDER_OUTLINE_EDGE,
     RENDER_OUTLINE_POSITIVE,
     RENDER_OUTLINE_NEGATIVE,
     RENDER_SIGNED_DISTANCE_FIELD
-} rendermode_t;
+};
 
 /**
  * A structure that hold a kerning value relatively to a Unicode
@@ -53,7 +57,7 @@ typedef enum rendermode_t
  * This structure cannot be used alone since the (necessary) right
  * Unicode codepoint is implicitely held by the owner of this structure.
  */
-typedef struct kerning_t
+struct kerning_t
 {
     /**
      * Left Unicode codepoint in the kern pair in UTF-32 LE encoding.
@@ -65,7 +69,7 @@ typedef struct kerning_t
      */
     float kerning;
 
-} kerning_t;
+};
 
 /*
  * Glyph metrics:
@@ -103,27 +107,38 @@ typedef struct kerning_t
 /**
  * A structure that describe a glyph.
  */
-typedef struct texture_glyph_t
+class TextureGlyph
 {
+public:
+    /**
+     * Get the kerning between two horizontal glyphs.
+     *
+     * @param codepoint Character codepoint of the peceding character in UTF-8
+     * encoding.
+     *
+     * @return x kerning value
+     */
+    float get_kerning(const char *codepoint) const;
+
     /**
      * Unicode codepoint this glyph represents in UTF-32 LE encoding.
      */
-    uint32_t codepoint;
+    uint32_t codepoint{ 0xFFFFFFFF };
 
     /**
      * Glyph's width in pixels.
      */
-    size_t width;
+    size_t width{ 0 };
 
     /**
      * Glyph's height in pixels.
      */
-    size_t height;
+    size_t height{ 0 };
 
     /**
      * Glyph's left bearing expressed in integer pixels.
      */
-    int offset_x;
+    int offset_x{ 0 };
 
     /**
      * Glyphs's top bearing expressed in integer pixels.
@@ -131,73 +146,163 @@ typedef struct texture_glyph_t
      * Remember that this is the distance from the baseline to the top-most
      * glyph scanline, upwards y coordinates being positive.
      */
-    int offset_y;
+    int offset_y{ 0 };
 
     /**
      * For horizontal text layouts, this is the horizontal distance (in
      * fractional pixels) used to increment the pen position when the glyph is
      * drawn as part of a string of text.
      */
-    float advance_x;
+    float advance_x{ 0.0f };
 
     /**
      * For vertical text layouts, this is the vertical distance (in fractional
      * pixels) used to increment the pen position when the glyph is drawn as
      * part of a string of text.
      */
-    float advance_y;
+    float advance_y{ 0.0f };
 
     /**
      * First normalized texture coordinate (x) of top-left corner
      */
-    float s0;
+    float s0{ 0.0f };
 
     /**
      * Second normalized texture coordinate (y) of top-left corner
      */
-    float t0;
+    float t0{ 0.0f };
 
     /**
      * First normalized texture coordinate (x) of bottom-right corner
      */
-    float s1;
+    float s1{ 0.0f };
 
     /**
      * Second normalized texture coordinate (y) of bottom-right corner
      */
-    float t1;
+    float t1{ 0.0f };
 
     /**
      * A vector of kerning pairs relative to this glyph.
      */
-    vector_t *kerning;
+    std::vector<kerning_t> kerning{};
 
     /**
      * Mode this glyph was rendered
      */
-    rendermode_t rendermode;
+    rendermode_t rendermode{ RENDER_NORMAL };
 
     /**
      * Glyph outline thickness
      */
-    float outline_thickness;
+    float outline_thickness{ 0.0f };
 
-} texture_glyph_t;
+};
 
 /**
  *  Texture font structure.
  */
-typedef struct texture_font_t
+class TextureFont
 {
+public:
     /**
-     * Vector of glyphs contained in this font.
+     * This function creates a new texture font from given filename and size.  The
+     * texture atlas is used to store glyph on demand. Note the depth of the atlas
+     * will determine if the font is rendered as alpha channel only (depth = 1) or
+     * RGB (depth = 3) that correspond to subpixel rendering (if available on your
+     * freetype implementation).
+     *
+     * @param atlas     A texture atlas
+     * @param pt_size   Size of font to be created (in points)
+     * @param filename  A font filename
+     *
      */
-    vector_t *glyphs;
+    TextureFont(TextureAtlas& atlas, float pt_size, std::string filename);
+
+    /**
+     * This function creates a new texture font from a memory location and size.
+     * The texture atlas is used to store glyph on demand. Note the depth of the
+     * atlas will determine if the font is rendered as alpha channel only
+     * (depth = 1) or RGB (depth = 3) that correspond to subpixel rendering (if
+     * available on your freetype implementation).
+     *
+     * @param atlas       A texture atlas
+     * @param pt_size     Size of font to be created (in points)
+     * @param memory_base Start of the font file in memory
+     * @param memory_size Size of the font file memory region, in bytes
+     *
+     */
+    TextureFont(TextureAtlas& atlas, float pt_size, const void *memory_base, size_t memory_size);
+
+    bool init();
+
+    FT_Face load_face(float size);
+
+    void generate_kerning(FT_Face *face);
+
+    /**
+     * Request a new glyph from the font. If it has not been created yet, it will
+     * be.
+     *
+     * @param codepoint Character codepoint to be loaded in UTF-8 encoding.
+     *
+     * @return A pointer on the new glyph or 0 if the texture atlas is not big
+     *         enough
+     *
+     */
+    TextureGlyph *get_glyph(const char *codepoint);
+
+    /**
+     * Request an already loaded glyph from the font.
+     *
+     * @param codepoint Character codepoint to be found in UTF-8 encoding.
+     *
+     * @return A pointer on the glyph or 0 if the glyph is not loaded
+     */
+    TextureGlyph *find_glyph(const char *codepoint);
+
+    /**
+     * Request the loading of a given glyph.
+     *
+     * @param codepoints Character codepoint to be loaded in UTF-8 encoding.
+     *
+     * @return One if the glyph could be loaded, zero if not.
+     */
+    bool load_glyph(const char *codepoint);
+
+    /**
+     * Request the loading of several glyphs at once.
+     *
+     * @param codepoints Character codepoints to be loaded in UTF-8 encoding. May
+     *                   contain duplicates.
+     *
+     * @return Number of missed glyph if the texture is not big enough to hold
+     *         every glyphs.
+     */
+    size_t load_glyphs(const char *codepoints);
+
+    /**
+     * Increases the size of a fonts texture atlas
+     * Invalidates all pointers to font->atlas->data
+     * Changes the UV Coordinates of existing glyphs in the font
+     *
+     * @param self A valid texture font
+     * @param width_new Width of the texture atlas after resizing (must be bigger or
+     *      equal to current width)
+     * @param height_new Height of the texture atlas after resizing (must be bigger
+     *      or equal to current height)
+     */
+    void enlarge_atlas(size_t width_new, size_t height_new);
 
     /**
      * Atlas structure to store glyphs data.
      */
-    texture_atlas_t *atlas;
+    TextureAtlas& atlas;
+
+    /**
+     * Vector of glyphs contained in this font.
+     */
+    std::vector<TextureGlyph> glyphs{};
 
     /**
      * font location
@@ -208,47 +313,38 @@ typedef struct texture_font_t
         TEXTURE_FONT_MEMORY,
     } location;
 
-    union
-    {
-        /**
-         * Font filename, for when location == TEXTURE_FONT_FILE
-         */
-        char *filename;
+    std::string filename{};
 
-        /**
-         * Font memory address, for when location == TEXTURE_FONT_MEMORY
-         */
-        struct
-        {
-            const void *base;
-            size_t size;
-        } memory;
-    };
+    struct
+    {
+        const void *base{ nullptr };
+        size_t size{ 0 };
+    } memory;
 
     /**
      * Font size
      */
-    float size;
+    const float size;
 
     /**
      * Whether to use autohint when rendering font
      */
-    int hinting;
+    bool hinting{ true };
 
     /**
      * Mode the font is rendering its next glyph
      */
-    rendermode_t rendermode;
+    rendermode_t rendermode{ RENDER_NORMAL };
 
     /**
      * Outline thickness
      */
-    float outline_thickness;
+    float outline_thickness{ 0.0f };
 
     /**
      * Whether to use our own lcd filter.
      */
-    int filtering;
+    bool filtering{ true };
 
     /**
      * LCD filter weights
@@ -258,7 +354,7 @@ typedef struct texture_font_t
     /**
      * Whether to use kerning if available
      */
-    int kerning;
+    bool kerning{ true };
 
     /**
      * This field is simply used to compute a default line spacing (i.e., the
@@ -267,14 +363,14 @@ typedef struct texture_font_t
      * taken as absolute values. There is also no guarantee that no glyphs
      * extend above or below subsequent baselines when using this distance.
      */
-    float height;
+    float height{ 0.0f };
 
     /**
      * This field is the distance that must be placed between two lines of
      * text. The baseline-to-baseline distance should be computed as:
      * ascender - descender + linegap
      */
-    float linegap;
+    float linegap{ 0.0f };
 
     /**
      * The ascender is the vertical distance from the horizontal baseline to
@@ -284,7 +380,7 @@ typedef struct texture_font_t
      * is the ascent of the highest accented character, and finally, other
      * formats define it as being equal to bbox.yMax.
      */
-    float ascender;
+    float ascender{ 0.0f };
 
     /**
      * The descender is the vertical distance from the horizontal baseline to
@@ -295,147 +391,24 @@ typedef struct texture_font_t
      * formats define it as being equal to bbox.yMin. This field is negative
      * for values below the baseline.
      */
-    float descender;
+    float descender{ 0.0f };
 
     /**
      * The position of the underline line for this face. It is the center of
      * the underlining stem. Only relevant for scalable formats.
      */
-    float underline_position;
+    float underline_position{ 0.0f };
 
     /**
      * The thickness of the underline for this face. Only relevant for scalable
      * formats.
      */
     float underline_thickness;
+};
 
-} texture_font_t;
 
-/**
- * This function creates a new texture font from given filename and size.  The
- * texture atlas is used to store glyph on demand. Note the depth of the atlas
- * will determine if the font is rendered as alpha channel only (depth = 1) or
- * RGB (depth = 3) that correspond to subpixel rendering (if available on your
- * freetype implementation).
- *
- * @param atlas     A texture atlas
- * @param pt_size   Size of font to be created (in points)
- * @param filename  A font filename
- *
- * @return A new empty font (no glyph inside yet)
- *
- */
-texture_font_t *texture_font_new_from_file(texture_atlas_t *atlas,
-                                           const float pt_size,
-                                           const char *filename);
 
-/**
- * This function creates a new texture font from a memory location and size.
- * The texture atlas is used to store glyph on demand. Note the depth of the
- * atlas will determine if the font is rendered as alpha channel only
- * (depth = 1) or RGB (depth = 3) that correspond to subpixel rendering (if
- * available on your freetype implementation).
- *
- * @param atlas       A texture atlas
- * @param pt_size     Size of font to be created (in points)
- * @param memory_base Start of the font file in memory
- * @param memory_size Size of the font file memory region, in bytes
- *
- * @return A new empty font (no glyph inside yet)
- *
- */
-texture_font_t *texture_font_new_from_memory(texture_atlas_t *atlas,
-                                             float pt_size,
-                                             const void *memory_base,
-                                             size_t memory_size);
 
-/**
- * Delete a texture font. Note that this does not delete the glyph from the
- * texture atlas.
- *
- * @param self a valid texture font
- */
-void texture_font_delete(texture_font_t *self);
-
-/**
- * Request a new glyph from the font. If it has not been created yet, it will
- * be.
- *
- * @param self      A valid texture font
- * @param codepoint Character codepoint to be loaded in UTF-8 encoding.
- *
- * @return A pointer on the new glyph or 0 if the texture atlas is not big
- *         enough
- *
- */
-texture_glyph_t *texture_font_get_glyph(texture_font_t *self,
-                                        const char *codepoint);
-
-/**
- * Request an already loaded glyph from the font.
- *
- * @param self      A valid texture font
- * @param codepoint Character codepoint to be found in UTF-8 encoding.
- *
- * @return A pointer on the glyph or 0 if the glyph is not loaded
- */
-texture_glyph_t *texture_font_find_glyph(texture_font_t *self,
-                                         const char *codepoint);
-
-/**
- * Request the loading of a given glyph.
- *
- * @param self       A valid texture font
- * @param codepoints Character codepoint to be loaded in UTF-8 encoding.
- *
- * @return One if the glyph could be loaded, zero if not.
- */
-int texture_font_load_glyph(texture_font_t *self, const char *codepoint);
-
-/**
- * Request the loading of several glyphs at once.
- *
- * @param self       A valid texture font
- * @param codepoints Character codepoints to be loaded in UTF-8 encoding. May
- *                   contain duplicates.
- *
- * @return Number of missed glyph if the texture is not big enough to hold
- *         every glyphs.
- */
-size_t texture_font_load_glyphs(texture_font_t *self, const char *codepoints);
-
-/*
- *Increases the size of a fonts texture atlas
- *Invalidates all pointers to font->atlas->data
- *Changes the UV Coordinates of existing glyphs in the font
- *
- *@param self A valid texture font
- *@param width_new Width of the texture atlas after resizing (must be bigger or
- *equal to current width)
- *@param height_new Height of the texture atlas after resizing (must be bigger
- *or equal to current height)
- */
-void texture_font_enlarge_atlas(texture_font_t *self, size_t width_new,
-                                size_t height_new);
-
-/**
- * Get the kerning between two horizontal glyphs.
- *
- * @param self      A valid texture glyph
- * @param codepoint Character codepoint of the peceding character in UTF-8
- * encoding.
- *
- * @return x kerning value
- */
-float texture_glyph_get_kerning(const texture_glyph_t *self,
-                                const char *codepoint);
-
-/**
- * Creates a new empty glyph
- *
- * @return a new empty glyph (not valid)
- */
-texture_glyph_t *texture_glyph_new(void);
 
 /** @} */
 

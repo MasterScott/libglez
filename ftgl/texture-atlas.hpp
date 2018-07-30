@@ -129,12 +129,12 @@ public:
     /**
      *  Width (in pixels) of the underlying texture
      */
-    const size_t width;
+    size_t width;
 
     /**
      * Height (in pixels) of the underlying texture
      */
-    const size_t height;
+    size_t height;
 
     /**
      * Depth (in bytes) of the underlying texture
