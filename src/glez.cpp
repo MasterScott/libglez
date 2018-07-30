@@ -9,12 +9,17 @@
 #include <glez/detail/texture.hpp>
 #include <glez/record.hpp>
 #include <glez/detail/record.hpp>
+#include <glez/glez.hpp>
+
+static bool pre_init_done{ false };
 
 namespace glez
 {
 
 void init(int width, int height)
 {
+    if (!pre_init_done)
+        preInit();
     detail::program::init(width, height);
     detail::texture::init();
 }
@@ -44,5 +49,6 @@ void end()
 void preInit()
 {
     detail::font::init();
+    pre_init_done = true;
 }
 }

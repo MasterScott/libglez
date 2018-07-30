@@ -100,12 +100,12 @@ GLuint link(GLuint vertex, GLuint fragment)
 namespace glez::detail::program
 {
 
-vertex_buffer_t *buffer{ nullptr };
+ftgl::vertex_buffer_t *buffer{ nullptr };
 
 void resize(int width, int height)
 {
     glUseProgram(shader);
-    mat4 projection;
+    ftgl::mat4 projection;
     mat4_set_identity(&projection);
     mat4_set_orthographic(&projection, 0, width, height, 0, -1, 1);
     glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, 0,

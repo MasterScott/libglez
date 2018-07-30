@@ -20,8 +20,8 @@ struct font
 
     bool init{ false };
 
-    texture_font_t *font{ nullptr };
-    texture_atlas_t *atlas{ nullptr };
+    ftgl::texture_font_t *font{ nullptr };
+    ftgl::texture_atlas_t *atlas{ nullptr };
 };
 
 void init();

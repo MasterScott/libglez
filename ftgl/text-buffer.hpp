@@ -3,20 +3,14 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __TEXT_BUFFER_H__
-#define __TEXT_BUFFER_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #include "vertex-buffer.hpp"
 #include "markup.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * Use LCD filtering
@@ -186,21 +180,22 @@ typedef struct line_info_t
 /**
  * Align enumeration
  */
-typedef enum Align {
+typedef enum Align
+{
     /**
      * Align text to the left hand side
      */
-    ALIGN_LEFT,
+            ALIGN_LEFT,
 
     /**
      * Align text to the center
      */
-    ALIGN_CENTER,
+            ALIGN_CENTER,
 
     /**
      * Align text to the right hand side
      */
-    ALIGN_RIGHT
+            ALIGN_RIGHT
 } Align;
 
 /**
@@ -281,9 +276,4 @@ void text_buffer_clear(text_buffer_t *self);
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* #define __TEXT_BUFFER_H__ */

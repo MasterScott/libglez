@@ -3,19 +3,17 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __MAT4_H__
-#define __MAT4_H__
 
-#ifdef __cplusplus
-extern "C" {
+#pragma once
+
 namespace ftgl
 {
-#endif
 
 /**
  *
  */
-typedef union {
+typedef union
+{
     float data[16]; /**< All compoments at once     */
     struct
     {
@@ -55,9 +53,4 @@ void mat4_translate(mat4 *self, float x, float y, float z);
 
 void mat4_scale(mat4 *self, float x, float y, float z);
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __MAT4_H__ */

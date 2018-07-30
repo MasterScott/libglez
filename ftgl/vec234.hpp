@@ -3,14 +3,11 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __VEC234_H__
-#define __VEC234_H__
 
-#ifdef __cplusplus
-extern "C" {
+#pragma once
+
 namespace ftgl
 {
-#endif
 
 /**
  * Tuple of 4 ints.
@@ -213,9 +210,4 @@ typedef union {
     };
 } vec2;
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __VEC234_H__ */

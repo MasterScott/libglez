@@ -27,7 +27,7 @@ void font::load(const std::string &path, float size)
 {
     assert(size > 0);
 
-    atlas = texture_atlas_new(1024, 1024, 1);
+    atlas = ftgl::texture_atlas_new(1024, 1024, 1);
     assert(atlas != nullptr);
 
     font = texture_font_new_from_file(atlas, size, path.c_str());
@@ -62,7 +62,7 @@ void font::stringSize(const std::string &string, float *width, float *height)
     for (size_t i = 0; i < string.size(); ++i)
     {
         // c_str guarantees a NULL terminator
-        texture_glyph_t *glyph = texture_font_find_glyph(font, &sstring[i]);
+        ftgl::texture_glyph_t *glyph = texture_font_find_glyph(font, &sstring[i]);
         if (glyph == nullptr)
             continue;
 

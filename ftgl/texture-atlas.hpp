@@ -15,22 +15,16 @@
  *
  *  ============================================================================
  */
-#ifndef __TEXTURE_ATLAS_H__
-#define __TEXTURE_ATLAS_H__
+
+#pragma once
 
 #include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "vector.hpp"
 #include "vec234.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   texture-atlas.h
@@ -176,9 +170,4 @@ void texture_atlas_clear(texture_atlas_t *self);
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __TEXTURE_ATLAS_H__ */

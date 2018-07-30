@@ -21,7 +21,7 @@ static GLuint rectangle[6] = { 0, 1, 2, 2, 3, 0 };
 }
 
 void internal_draw_string(float x, float y, const std::string &string,
-                          texture_font_t *fnt, glez::rgba color, float *width,
+                          ftgl::texture_font_t *fnt, glez::rgba color, float *width,
                           float *height)
 {
     float pen_x  = x;
@@ -60,7 +60,7 @@ void internal_draw_string(float x, float y, const std::string &string,
 
     for (size_t i = 0; i < string.size(); ++i)
     {
-        texture_glyph_t *glyph = texture_font_find_glyph(fnt, &sstring[i]);
+        ftgl::texture_glyph_t *glyph = texture_font_find_glyph(fnt, &sstring[i]);
         if (glyph == NULL)
         {
             texture_font_load_glyph(fnt, &sstring[i]);
@@ -229,7 +229,7 @@ void string(float x, float y, const std::string &string, font &font, rgba color,
         font.load();
 
     auto fnt               = glez::detail::font::get(font.getHandle()).font;
-    fnt->rendermode        = RENDER_NORMAL;
+    fnt->rendermode        = ftgl::RENDER_NORMAL;
     fnt->outline_thickness = 0.0f;
     internal_draw_string(x, y, string, fnt, color, width, height);
 }
@@ -241,10 +241,10 @@ void outlined_string(float x, float y, const std::string &string, font &font,
         font.load();
 
     auto fnt               = glez::detail::font::get(font.getHandle()).font;
-    fnt->rendermode        = RENDER_OUTLINE_POSITIVE;
+    fnt->rendermode        = ftgl::RENDER_OUTLINE_POSITIVE;
     fnt->outline_thickness = 1.0f;
     internal_draw_string(x, y, string, fnt, outline, width, height);
-    fnt->rendermode        = RENDER_NORMAL;
+    fnt->rendermode        = ftgl::RENDER_NORMAL;
     fnt->outline_thickness = 0.0f;
     internal_draw_string(x, y, string, fnt, color, width, height);
 }

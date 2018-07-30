@@ -55,17 +55,11 @@
  * Updated in 2011 to avoid a corner case infinite loop.
  *
  */
-#ifndef __EDTAA3FUNC_H__
-#define __EDTAA3FUNC_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /*
  * Compute the local gradient at edge pixels using convolution filters.
@@ -95,9 +89,4 @@ double distaa3(double *img, double *gximg, double *gyimg, int w, int c, int xc,
 void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
             short *disty, double *dist);
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif // __EDTAA3FUNC_H__

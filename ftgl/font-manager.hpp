@@ -3,22 +3,16 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __FONT_MANAGER_H__
-#define __FONT_MANAGER_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #include "vector.hpp"
 #include "markup.hpp"
 #include "texture-font.hpp"
 #include "texture-atlas.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   font-manager.h
@@ -154,9 +148,4 @@ char *font_manager_match_description(font_manager_t *self, const char *family,
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif // ifdef __cplusplus
-
-#endif /* __FONT_MANAGER_H__ */

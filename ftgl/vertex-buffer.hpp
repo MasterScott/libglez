@@ -3,21 +3,14 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __VERTEX_BUFFER_H__
-#define __VERTEX_BUFFER_H__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #include "opengl.hpp"
 #include "vector.hpp"
 #include "vertex-attribute.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   vertex-buffer.h
@@ -271,9 +264,4 @@ void vertex_buffer_erase(vertex_buffer_t *self, const size_t index);
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __VERTEX_BUFFER_H__ */

@@ -3,21 +3,14 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __VECTOR_H__
-#define __VECTOR_H__
+
+#pragma once
 
 #include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   vector.h
@@ -262,9 +255,4 @@ void vector_sort(vector_t *self, int (*cmp)(const void *, const void *));
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __VECTOR_H__ */

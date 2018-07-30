@@ -3,23 +3,16 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __TEXTURE_FONT_H__
-#define __TEXTURE_FONT_H__
+
+#pragma once
 
 #include <stdlib.h>
 #include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "vector.hpp"
 #include "texture-atlas.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   texture-font.h
@@ -45,7 +38,8 @@ namespace ftgl
 /**
  * A list of possible ways to render a glyph.
  */
-typedef enum rendermode_t {
+typedef enum rendermode_t
+{
     RENDER_NORMAL,
     RENDER_OUTLINE_EDGE,
     RENDER_OUTLINE_POSITIVE,
@@ -215,7 +209,8 @@ typedef struct texture_font_t
         TEXTURE_FONT_MEMORY,
     } location;
 
-    union {
+    union
+    {
         /**
          * Font filename, for when location == TEXTURE_FONT_FILE
          */
@@ -409,6 +404,7 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint);
  *         every glyphs.
  */
 size_t texture_font_load_glyphs(texture_font_t *self, const char *codepoints);
+
 /*
  *Increases the size of a fonts texture atlas
  *Invalidates all pointers to font->atlas->data
@@ -422,6 +418,7 @@ size_t texture_font_load_glyphs(texture_font_t *self, const char *codepoints);
  */
 void texture_font_enlarge_atlas(texture_font_t *self, size_t width_new,
                                 size_t height_new);
+
 /**
  * Get the kerning between two horizontal glyphs.
  *
@@ -443,9 +440,4 @@ texture_glyph_t *texture_glyph_new(void);
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __TEXTURE_FONT_H__ */

@@ -3,18 +3,14 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __UTF8_UTILS_H__
-#define __UTF8_UTILS_H__
+
+#pragma once
 
 #include <stdlib.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-
 namespace ftgl
 {
-#endif
 
 /**
  * @file    utf8-utils.h
@@ -58,9 +54,4 @@ uint32_t utf8_to_utf32(const char *character);
  * @}
  */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* #define __UTF8_UTILS_H__ */

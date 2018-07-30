@@ -3,20 +3,14 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __MARKUP_H__
-#define __MARKUP_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #include "texture-font.hpp"
 #include "vec234.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   markup.h
@@ -156,9 +150,4 @@ extern markup_t default_markup;
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __MARKUP_H__ */

@@ -56,7 +56,7 @@ RecordedCommands::store(glez::detail::render::vertex *vertices, size_t vcount,
 
 RecordedCommands::RecordedCommands()
 {
-    vertex_buffer = vertex_buffer_new("vertex:2f,tex_coord:2f,color:4f,drawmode:1i");
+    vertex_buffer = ftgl::vertex_buffer_new("vertex:2f,tex_coord:2f,color:4f,drawmode:1i");
 }
 
 RecordedCommands::~RecordedCommands()

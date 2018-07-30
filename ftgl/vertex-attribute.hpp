@@ -3,20 +3,13 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __VERTEX_ATTRIBUTE_H__
-#define __VERTEX_ATTRIBUTE_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #include "opengl.hpp"
-#include "vector.hpp"
 
-#ifdef __cplusplus
 namespace ftgl
 {
-#endif
 
 /**
  * @file   vertex-attribute.h
@@ -275,9 +268,4 @@ void vertex_attribute_enable(vertex_attribute_t *attr);
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __VERTEX_ATTRIBUTE_H__ */

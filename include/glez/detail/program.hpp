@@ -30,5 +30,5 @@ void end();
 
 unsigned next_index();
 
-extern vertex_buffer_t *buffer;
+extern ftgl::vertex_buffer_t *buffer;
 };

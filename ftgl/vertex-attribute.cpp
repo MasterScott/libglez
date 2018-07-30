@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "vec234.hpp"
-#include "platform.hpp"
 #include "vertex-attribute.hpp"
 
 namespace ftgl
