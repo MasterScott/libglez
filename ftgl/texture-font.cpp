@@ -507,91 +507,81 @@ FT_Face TextureFont::load_face(float size)
     assert(size);
 
     FT_Error error;
+    FT_Face face{};
 
     /* Load face */
     switch (location)
     {
     case TEXTURE_FONT_FILE:
-        error = FT_New_Face(library, filename.c_str(), 0, face);
+        error = FT_New_Face(library, filename.c_str(), 0, &face);
         break;
-
     case TEXTURE_FONT_MEMORY:
-        error = FT_New_Memory_Face(library, (const FT_Byte *)self->memory.base,
-                                   self->memory.size, 0, face);
+        error = FT_New_Memory_Face(library, (const FT_Byte *)memory.base,
+                                   memory.size, 0, &face);
         break;
     }
+
+    FaceRAII face_raii{ face };
 
     if (error)
     {
         fprintf(stderr, "FT_Error (line %d, code 0x%02x) : %s\n", __LINE__,
                 FT_Errors[error].code, FT_Errors[error].message);
-        goto cleanup_library;
+        return nullptr;
     }
 
     /* Select charmap */
-    error = FT_Select_Charmap(*face, FT_ENCODING_UNICODE);
+    error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     if (error)
     {
         fprintf(stderr, "FT_Error (line %d, code 0x%02x) : %s\n", __LINE__,
                 FT_Errors[error].code, FT_Errors[error].message);
-        goto cleanup_face;
+        return nullptr;
     }
 
     /* Set char size */
-    error = FT_Set_Char_Size(*face, (int) (size * HRES), 0, DPI * HRES, DPI);
+    error = FT_Set_Char_Size(face, (int) (size * HRES), 0, DPI * HRES, DPI);
 
     if (error)
     {
         fprintf(stderr, "FT_Error (line %d, code 0x%02x) : %s\n", __LINE__,
                 FT_Errors[error].code, FT_Errors[error].message);
-        goto cleanup_face;
+        return nullptr;
     }
 
     /* Set transform matrix */
-    FT_Set_Transform(*face, &matrix, NULL);
+    FT_Set_Transform(face, &matrix, nullptr);
 
-    return 1;
+    /* Prevent the deletion */
+    face_raii.face = nullptr;
 
-    cleanup_face:
-    FT_Done_Face(*face);
-    cleanup_library:
-    FT_Done_FreeType(*library);
-    cleanup:
-    return 0;
+    return face;
 }
 
 void
-TextureFont::generate_kerning(FT_Face *face)
+TextureFont::generate_kerning(FT_Face face)
 {
-    size_t i, j;
-    FT_UInt glyph_index, prev_index;
-    texture_glyph_t *glyph, *prev_glyph;
+    FT_UInt prev_index;
     FT_Vector kerning;
-
-    assert(self);
 
     /* For each glyph couple combination, check if kerning is necessary */
     /* Starts at index 1 since 0 is for the special backgroudn glyph */
-    for (i = 1; i < self->glyphs->size; ++i)
+    for (auto i = 1; i < glyphs.size(); ++i)
     {
-        glyph = *(texture_glyph_t **) vector_get(self->glyphs, i);
-        glyph_index = FT_Get_Char_Index(*face, glyph->codepoint);
-        vector_clear(glyph->kerning);
+        auto& glyph = glyphs[i];
+        auto glyph_index = FT_Get_Char_Index(face, glyph.codepoint);
+        glyph.kerning.clear();
 
-        for (j = 1; j < self->glyphs->size; ++j)
+        for (auto j = 1; j < glyphs.size(); ++j)
         {
-            prev_glyph = *(texture_glyph_t **) vector_get(self->glyphs, j);
-            prev_index = FT_Get_Char_Index(*face, prev_glyph->codepoint);
-            FT_Get_Kerning(*face, prev_index, glyph_index, FT_KERNING_UNFITTED,
+            auto& prev_glyph = glyphs[j];
+            prev_index = FT_Get_Char_Index(face, prev_glyph.codepoint);
+            FT_Get_Kerning(face, prev_index, glyph_index, FT_KERNING_UNFITTED,
                            &kerning);
-            // printf("%c(%d)-%c(%d): %ld\n",
-            //       prev_glyph->codepoint, prev_glyph->codepoint,
-            //       glyph_index, glyph_index, kerning.x);
             if (kerning.x)
             {
-                kerning_t k = {prev_glyph->codepoint,
-                               kerning.x / (float) (HRESf * HRESf)};
-                vector_push_back(glyph->kerning, &k);
+                glyph.kerning.push_back({prev_glyph.codepoint,
+                                         kerning.x / (HRESf * HRESf)});
             }
         }
     }

@@ -238,7 +238,7 @@ public:
 
     FT_Face load_face(float size);
 
-    void generate_kerning(FT_Face *face);
+    void generate_kerning(FT_Face face);
 
     /**
      * Request a new glyph from the font. If it has not been created yet, it will
