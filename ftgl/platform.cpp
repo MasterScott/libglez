@@ -4,7 +4,7 @@
  * file `LICENSE` for more details.
  */
 #include <string.h>
-#include "platform.h"
+#include "platform.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
 

@@ -3,9 +3,9 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <freetype-gl.h>
-#include <vertex-buffer.h>
-#include <mat4.h>
+#include <freetype-gl.hpp>
+#include <vertex-buffer.hpp>
+#include <mat4.hpp>
 #include <glez/detail/program.hpp>
 #include <cstdio>
 #include <stdexcept>

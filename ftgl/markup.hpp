@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-#include "texture-font.h"
-#include "vec234.h"
+#include "texture-font.hpp"
+#include "vec234.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

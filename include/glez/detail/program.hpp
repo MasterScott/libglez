@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <vertex-buffer.h>
+#include <vertex-buffer.hpp>
 
 namespace glez::detail::program
 {

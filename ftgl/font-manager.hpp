@@ -10,10 +10,10 @@
 extern "C" {
 #endif
 
-#include "vector.h"
-#include "markup.h"
-#include "texture-font.h"
-#include "texture-atlas.h"
+#include "vector.hpp"
+#include "markup.hpp"
+#include "texture-font.hpp"
+#include "texture-atlas.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

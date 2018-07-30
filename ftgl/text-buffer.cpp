@@ -9,9 +9,12 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#include "opengl.h"
-#include "text-buffer.h"
-#include "utf8-utils.h"
+#include "opengl.hpp"
+#include "text-buffer.hpp"
+#include "utf8-utils.hpp"
+
+namespace ftgl
+{
 
 #define SET_GLYPH_VERTEX(value, x0, y0, z0, s0, t0, r, g, b, a, sh, gm)        \
     {                                                                          \
@@ -34,20 +37,20 @@
 text_buffer_t *text_buffer_new()
 {
     text_buffer_t *self = (text_buffer_t *) malloc(sizeof(text_buffer_t));
-    self->buffer        = vertex_buffer_new(
-        "vertex:3f,tex_coord:2f,color:4f,ashift:1f,agamma:1f");
-    self->line_start     = 0;
-    self->line_ascender  = 0;
-    self->base_color.r   = 0.0;
-    self->base_color.g   = 0.0;
-    self->base_color.b   = 0.0;
-    self->base_color.a   = 1.0;
+    self->buffer = vertex_buffer_new(
+            "vertex:3f,tex_coord:2f,color:4f,ashift:1f,agamma:1f");
+    self->line_start = 0;
+    self->line_ascender = 0;
+    self->base_color.r = 0.0;
+    self->base_color.g = 0.0;
+    self->base_color.b = 0.0;
+    self->base_color.a = 1.0;
     self->line_descender = 0;
-    self->lines          = vector_new(sizeof(line_info_t));
-    self->bounds.left    = 0.0;
-    self->bounds.top     = 0.0;
-    self->bounds.width   = 0.0;
-    self->bounds.height  = 0.0;
+    self->lines = vector_new(sizeof(line_info_t));
+    self->bounds.left = 0.0;
+    self->bounds.top = 0.0;
+    self->bounds.width = 0.0;
+    self->bounds.height = 0.0;
     return self;
 }
 
@@ -65,13 +68,13 @@ void text_buffer_clear(text_buffer_t *self)
     assert(self);
 
     vertex_buffer_clear(self->buffer);
-    self->line_start     = 0;
-    self->line_ascender  = 0;
+    self->line_start = 0;
+    self->line_ascender = 0;
     self->line_descender = 0;
     vector_clear(self->lines);
-    self->bounds.left   = 0.0;
-    self->bounds.top    = 0.0;
-    self->bounds.width  = 0.0;
+    self->bounds.left = 0.0;
+    self->bounds.top = 0.0;
+    self->bounds.width = 0.0;
     self->bounds.height = 0.0;
 }
 
@@ -93,7 +96,7 @@ void text_buffer_printf(text_buffer_t *self, vec2 *pen, ...)
         markup = va_arg(args, markup_t *);
         if (markup == NULL)
         {
-        	va_end(args);
+            va_end(args);
             return;
         }
         text = va_arg(args, char *);
@@ -113,7 +116,7 @@ void text_buffer_move_last_line(text_buffer_t *self, float dy)
         for (j = item->vstart; j < item->vstart + item->vcount; ++j)
         {
             glyph_vertex_t *vertex =
-                (glyph_vertex_t *) vector_get(self->buffer->vertices, j);
+                    (glyph_vertex_t *) vector_get(self->buffer->vertices, j);
             vertex->y -= dy;
         }
     }
@@ -130,18 +133,18 @@ void text_buffer_move_last_line(text_buffer_t *self, float dy)
 static void text_buffer_finish_line(text_buffer_t *self, vec2 *pen,
                                     bool advancePen)
 {
-    float line_left   = self->line_left;
-    float line_right  = pen->x;
-    float line_width  = line_right - line_left;
-    float line_top    = pen->y + self->line_ascender;
+    float line_left = self->line_left;
+    float line_right = pen->x;
+    float line_width = line_right - line_left;
+    float line_top = pen->y + self->line_ascender;
     float line_height = self->line_ascender - self->line_descender;
     float line_bottom = line_top - line_height;
 
     line_info_t line_info;
-    line_info.line_start    = self->line_start;
-    line_info.bounds.left   = line_left;
-    line_info.bounds.top    = line_top;
-    line_info.bounds.width  = line_width;
+    line_info.line_start = self->line_start;
+    line_info.bounds.left = line_left;
+    line_info.bounds.top = line_top;
+    line_info.bounds.width = line_width;
     line_info.bounds.height = line_height;
 
     vector_push_back(self->lines, &line_info);
@@ -155,7 +158,7 @@ static void text_buffer_finish_line(text_buffer_t *self, vec2 *pen,
         self->bounds.top = line_top;
     }
 
-    float self_right  = self->bounds.left + self->bounds.width;
+    float self_right = self->bounds.left + self->bounds.width;
     float self_bottom = self->bounds.top - self->bounds.height;
 
     if (line_right > self_right)
@@ -174,9 +177,9 @@ static void text_buffer_finish_line(text_buffer_t *self, vec2 *pen,
     }
 
     self->line_descender = 0;
-    self->line_ascender  = 0;
-    self->line_start     = vector_size(self->buffer->items);
-    self->line_left      = pen->x;
+    self->line_ascender = 0;
+    self->line_start = vector_size(self->buffer->items);
+    self->line_left = pen->x;
 }
 
 // ----------------------------------------------------------------------------
@@ -203,12 +206,11 @@ void text_buffer_add_text(text_buffer_t *self, vec2 *pen, markup_t *markup,
     }
     if (vertex_buffer_size(self->buffer) == 0)
     {
-        self->origin      = *pen;
-        self->line_left   = pen->x;
+        self->origin = *pen;
+        self->line_left = pen->x;
         self->bounds.left = pen->x;
-        self->bounds.top  = pen->y;
-    }
-    else
+        self->bounds.top = pen->y;
+    } else
     {
         if (pen->x < self->origin.x)
         {
@@ -234,11 +236,11 @@ void text_buffer_add_text(text_buffer_t *self, vec2 *pen, markup_t *markup,
 void text_buffer_add_char(text_buffer_t *self, vec2 *pen, markup_t *markup,
                           const char *current, const char *previous)
 {
-    size_t vcount           = 0;
-    size_t icount           = 0;
+    size_t vcount = 0;
+    size_t icount = 0;
     vertex_buffer_t *buffer = self->buffer;
-    texture_font_t *font    = markup->font;
-    float gamma             = markup->gamma;
+    texture_font_t *font = markup->font;
+    float gamma = markup->gamma;
 
     // Maximum number of vertices is 20 (= 5x2 triangles) per glyph:
     //  - 2 triangles for background
@@ -287,10 +289,10 @@ void text_buffer_add_char(text_buffer_t *self, vec2 *pen, markup_t *markup,
     // Background
     if (markup->background_color.alpha > 0)
     {
-        float r  = markup->background_color.r;
-        float g  = markup->background_color.g;
-        float b  = markup->background_color.b;
-        float a  = markup->background_color.a;
+        float r = markup->background_color.r;
+        float g = markup->background_color.g;
+        float b = markup->background_color.b;
+        float a = markup->background_color.a;
         float x0 = (pen->x - kerning);
         float y0 = (float) (int) (pen->y + font->descender);
         float x1 = (x0 + glyph->advance_x);
@@ -321,10 +323,10 @@ void text_buffer_add_char(text_buffer_t *self, vec2 *pen, markup_t *markup,
     // Underline
     if (markup->underline)
     {
-        float r  = markup->underline_color.r;
-        float g  = markup->underline_color.g;
-        float b  = markup->underline_color.b;
-        float a  = markup->underline_color.a;
+        float r = markup->underline_color.r;
+        float g = markup->underline_color.g;
+        float b = markup->underline_color.b;
+        float a = markup->underline_color.a;
         float x0 = (pen->x - kerning);
         float y0 = (float) (int) (pen->y + font->underline_position);
         float x1 = (x0 + glyph->advance_x);
@@ -355,10 +357,10 @@ void text_buffer_add_char(text_buffer_t *self, vec2 *pen, markup_t *markup,
     // Overline
     if (markup->overline)
     {
-        float r  = markup->overline_color.r;
-        float g  = markup->overline_color.g;
-        float b  = markup->overline_color.b;
-        float a  = markup->overline_color.a;
+        float r = markup->overline_color.r;
+        float g = markup->overline_color.g;
+        float b = markup->overline_color.b;
+        float a = markup->overline_color.a;
         float x0 = (pen->x - kerning);
         float y0 = (float) (int) (pen->y + (int) font->ascender);
         float x1 = (x0 + glyph->advance_x);
@@ -388,10 +390,10 @@ void text_buffer_add_char(text_buffer_t *self, vec2 *pen, markup_t *markup,
     /* Strikethrough */
     if (markup->strikethrough)
     {
-        float r  = markup->strikethrough_color.r;
-        float g  = markup->strikethrough_color.g;
-        float b  = markup->strikethrough_color.b;
-        float a  = markup->strikethrough_color.a;
+        float r = markup->strikethrough_color.r;
+        float g = markup->strikethrough_color.g;
+        float b = markup->strikethrough_color.b;
+        float a = markup->strikethrough_color.a;
         float x0 = (pen->x - kerning);
         float y0 = (float) (int) (pen->y + (int) font->ascender * .33f);
         float x1 = (x0 + glyph->advance_x);
@@ -419,10 +421,10 @@ void text_buffer_add_char(text_buffer_t *self, vec2 *pen, markup_t *markup,
     }
     {
         // Actual glyph
-        float r  = markup->foreground_color.red;
-        float g  = markup->foreground_color.green;
-        float b  = markup->foreground_color.blue;
-        float a  = markup->foreground_color.alpha;
+        float r = markup->foreground_color.red;
+        float g = markup->foreground_color.green;
+        float b = markup->foreground_color.blue;
+        float a = markup->foreground_color.alpha;
         float x0 = (pen->x + glyph->offset_x);
         float y0 = (float) (int) (pen->y + glyph->offset_y);
         float x1 = (x0 + glyph->width);
@@ -474,8 +476,8 @@ void text_buffer_align(text_buffer_t *self, vec2 *pen, enum Align alignment)
     float line_left, line_right, line_center;
     float dx;
 
-    self_left   = self->bounds.left;
-    self_right  = self->bounds.left + self->bounds.width;
+    self_left = self->bounds.left;
+    self_right = self->bounds.left + self->bounds.width;
     self_center = (self_left + self_right) / 2;
 
     line_info_t *line_info;
@@ -489,9 +491,9 @@ void text_buffer_align(text_buffer_t *self, vec2 *pen, enum Align alignment)
         if (i + 1 < lines_count)
         {
             line_end =
-                ((line_info_t *) vector_get(self->lines, i + 1))->line_start;
-        }
-        else
+                    ((line_info_t *) vector_get(self->lines,
+                                                i + 1))->line_start;
+        } else
         {
             line_end = vector_size(self->buffer->items);
         }
@@ -501,12 +503,11 @@ void text_buffer_align(text_buffer_t *self, vec2 *pen, enum Align alignment)
         if (ALIGN_RIGHT == alignment)
         {
             dx = self_right - line_right;
-        }
-        else // ALIGN_CENTER
+        } else // ALIGN_CENTER
         {
-            line_left   = line_info->bounds.left;
+            line_left = line_info->bounds.left;
             line_center = (line_left + line_right) / 2;
-            dx          = self_center - line_center;
+            dx = self_center - line_center;
         }
 
         dx = roundf(dx);
@@ -517,7 +518,8 @@ void text_buffer_align(text_buffer_t *self, vec2 *pen, enum Align alignment)
             for (k = item->vstart; k < item->vstart + item->vcount; ++k)
             {
                 glyph_vertex_t *vertex =
-                    (glyph_vertex_t *) vector_get(self->buffer->vertices, k);
+                        (glyph_vertex_t *) vector_get(self->buffer->vertices,
+                                                      k);
                 vertex->x += dx;
             }
         }
@@ -533,4 +535,6 @@ vec4 text_buffer_get_bounds(text_buffer_t *self, vec2 *pen)
     }
 
     return self->bounds;
+}
+
 }

@@ -55,7 +55,10 @@
  */
 
 #include <math.h>
-#include "edtaa3func.h"
+#include "edtaa3func.hpp"
+
+namespace ftgl
+{
 
 /*
  * Compute the local gradient at edge pixels using convolution filters.
@@ -66,7 +69,7 @@ void computegradient(double *img, int w, int h, double *gx, double *gy)
 {
     int i, j, k, p, q;
     double glength, phi, phiscaled, ascaled, errsign, pfrac, qfrac, err0, err1,
-        err;
+            err;
 #define SQRT2 1.4142136
     for (i = 1; i < h - 1; i++)
     { // Avoid edges where the kernels would spill over
@@ -83,8 +86,8 @@ void computegradient(double *img, int w, int h, double *gx, double *gy)
                 if (glength > 0.0)
                 { // Avoid division by zero
                     glength = sqrt(glength);
-                    gx[k]   = gx[k] / glength;
-                    gy[k]   = gy[k] / glength;
+                    gx[k] = gx[k] / glength;
+                    gy[k] = gy[k] / glength;
                 }
             }
         }
@@ -110,8 +113,7 @@ double edgedf(double gx, double gy, double a)
     if ((gx == 0) || (gy == 0))
     {                 // Either A) gu or gv are zero, or B) both
         df = 0.5 - a; // Linear approximation is A) correct or B) a fair guess
-    }
-    else
+    } else
     {
         glength = sqrt(gx * gx + gy * gy);
         if (glength > 0)
@@ -128,19 +130,17 @@ double edgedf(double gx, double gy, double a)
         if (gx < gy)
         {
             temp = gx;
-            gx   = gy;
-            gy   = temp;
+            gx = gy;
+            gy = temp;
         }
         a1 = 0.5 * gy / gx;
         if (a < a1)
         { // 0 <= a < a1
             df = 0.5 * (gx + gy) - sqrt(2.0 * gx * gy * a);
-        }
-        else if (a < (1.0 - a1))
+        } else if (a < (1.0 - a1))
         { // a1 <= a <= 1-a1
             df = (0.5 - a) * gx;
-        }
-        else
+        } else
         { // 1-a1 < a <= 1
             df = -0.5 * (gx + gy) + sqrt(2.0 * gx * gy * (1.0 - a));
         }
@@ -155,9 +155,9 @@ double distaa3(double *img, double *gximg, double *gyimg, int w, int c, int xc,
     int closest;
 
     closest = c - xc - yc * w; // Index to the edge pixel pointed to from c
-    a       = img[closest];    // Grayscale value at the edge pixel
-    gx      = gximg[closest];  // X gradient component at the edge pixel
-    gy      = gyimg[closest];  // Y gradient component at the edge pixel
+    a = img[closest];    // Grayscale value at the edge pixel
+    gx = gximg[closest];  // X gradient component at the edge pixel
+    gy = gyimg[closest];  // Y gradient component at the edge pixel
 
     if (a > 1.0)
         a = 1.0;
@@ -165,7 +165,7 @@ double distaa3(double *img, double *gximg, double *gyimg, int w, int c, int xc,
         a = 0.0; // Clip grayscale values outside the range [0,1]
     if (a == 0.0)
         return 1000000.0; // Not an object pixel, return "very far" ("don't know
-                          // yet")
+    // yet")
 
     dx = (double) xi;
     dy = (double) yi;
@@ -175,8 +175,7 @@ double distaa3(double *img, double *gximg, double *gyimg, int w, int c, int xc,
     { // Use local gradient only at edges
         // Estimate based on local gradient only
         df = edgedf(gx, gy, a);
-    }
-    else
+    } else
     {
         // Estimate gradient based on direction to edge (accurate for large di)
         df = edgedf(dx, dy, a);
@@ -193,20 +192,20 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
 {
     int x, y, i, c;
     int offset_u, offset_ur, offset_r, offset_rd, offset_d, offset_dl, offset_l,
-        offset_lu;
+            offset_lu;
     double olddist, newdist;
     int cdistx, cdisty, newdistx, newdisty;
     int changed;
     double epsilon = 1e-3;
 
     /* Initialize index offsets for the current image width */
-    offset_u  = -w;
+    offset_u = -w;
     offset_ur = -w + 1;
-    offset_r  = 1;
+    offset_r = 1;
     offset_rd = w + 1;
-    offset_d  = w;
+    offset_d = w;
     offset_dl = w - 1;
-    offset_l  = -1;
+    offset_l = -1;
     offset_lu = -w - 1;
 
     /* Initialize the distance images */
@@ -217,13 +216,11 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
         if (img[i] <= 0.0)
         {
             dist[i] = 1000000.0; // Big value, means "not set yet"
-        }
-        else if (img[i] < 1.0)
+        } else if (img[i] < 1.0)
         {
             dist[i] =
-                edgedf(gx[i], gy[i], img[i]); // Gradient-assisted estimate
-        }
-        else
+                    edgedf(gx[i], gy[i], img[i]); // Gradient-assisted estimate
+        } else
         {
             dist[i] = 0.0; // Inside the object
         }
@@ -247,33 +244,33 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
             olddist = dist[i];
             if (olddist > 0) // If non-zero distance or not set yet
             {
-                c        = i + offset_u; // Index of candidate for testing
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_u; // Index of candidate for testing
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_ur;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_ur;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
             i++;
@@ -285,63 +282,63 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
                 if (olddist <= 0)
                     continue; // No need to update further
 
-                c        = i + offset_l;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_l;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_lu;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_lu;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_u;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_u;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_ur;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_ur;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
 
@@ -349,48 +346,48 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
             olddist = dist[i];
             if (olddist > 0) // If not already zero distance
             {
-                c        = i + offset_l;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_l;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_lu;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_lu;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_u;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_u;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx;
                 newdisty = cdisty + 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
 
@@ -405,18 +402,18 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
                 if (olddist <= 0)
                     continue; // Already zero distance
 
-                c        = i + offset_r;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_r;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
         }
@@ -433,33 +430,33 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
             olddist = dist[i];
             if (olddist > 0) // If not already zero distance
             {
-                c        = i + offset_d;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_d;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_dl;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_dl;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
             i--;
@@ -471,111 +468,111 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
                 if (olddist <= 0)
                     continue; // Already zero distance
 
-                c        = i + offset_r;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_r;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_rd;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_rd;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_d;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_d;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_dl;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_dl;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
             /* Leftmost pixel is special, has no left neighbors */
             olddist = dist[i];
             if (olddist > 0) // If not already zero distance
             {
-                c        = i + offset_r;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_r;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_rd;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_rd;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx - 1;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    olddist  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    olddist = newdist;
+                    changed = 1;
                 }
 
-                c        = i + offset_d;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_d;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx;
                 newdisty = cdisty - 1;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
 
@@ -589,22 +586,24 @@ void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx,
                 if (olddist <= 0)
                     continue; // Already zero distance
 
-                c        = i + offset_l;
-                cdistx   = distx[c];
-                cdisty   = disty[c];
+                c = i + offset_l;
+                cdistx = distx[c];
+                cdisty = disty[c];
                 newdistx = cdistx + 1;
                 newdisty = cdisty;
-                newdist  = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
+                newdist = DISTAA(c, cdistx, cdisty, newdistx, newdisty);
                 if (newdist < olddist - epsilon)
                 {
                     distx[i] = newdistx;
                     disty[i] = newdisty;
-                    dist[i]  = newdist;
-                    changed  = 1;
+                    dist[i] = newdist;
+                    changed = 1;
                 }
             }
         }
     } while (changed); // Sweep until no more updates are made
 
     /* The transformation is completed. */
+}
+
 }

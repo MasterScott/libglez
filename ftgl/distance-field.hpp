@@ -3,14 +3,10 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#ifndef __DISTANCE_FIELD_H__
-#define __DISTANCE_FIELD_H__
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
 namespace ftgl
 {
-#endif
 
 /**
  * @file   shader.h
@@ -58,9 +54,4 @@ unsigned char *make_distance_mapb(unsigned char *img, unsigned int width,
 
 /** @} */
 
-#ifdef __cplusplus
 }
-}
-#endif
-
-#endif /* __DISTANCE_FIELD_H__ */

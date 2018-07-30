@@ -9,10 +9,10 @@
 #include <glez/texture.hpp>
 #include <glez/font.hpp>
 #include "render.hpp"
-#include "../../../ftgl/vertex-buffer.h"
+#include "vertex-buffer.hpp"
 #include "texture.hpp"
 #include "font.hpp"
-#include "../../../ftgl/freetype-gl.h"
+#include "freetype-gl.hpp"
 
 namespace glez::detail::record
 {

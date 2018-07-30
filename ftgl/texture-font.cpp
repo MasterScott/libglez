@@ -13,10 +13,10 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include "distance-field.h"
-#include "texture-font.h"
-#include "platform.h"
-#include "utf8-utils.h"
+#include "distance-field.hpp"
+#include "texture-font.hpp"
+#include "platform.hpp"
+#include "utf8-utils.hpp"
 
 #define HRES 64
 #define HRESf 64.f
@@ -38,15 +38,17 @@ const struct
 } FT_Errors[] =
 #include FT_ERRORS_H
 
-    // ------------------------------------------------- texture_font_load_face
-    // ---
-    static int texture_font_load_face(texture_font_t * self, float size,
-                                      FT_Library *library, FT_Face *face)
+namespace ftgl
+{
+// ------------------------------------------------- texture_font_load_face
+// ---
+static int texture_font_load_face(texture_font_t *self, float size,
+                                  FT_Library *library, FT_Face *face)
 {
     FT_Error error;
-    FT_Matrix matrix = { (int) ((1.0 / HRES) * 0x10000L),
-                         (int) ((0.0) * 0x10000L), (int) ((0.0) * 0x10000L),
-                         (int) ((1.0) * 0x10000L) };
+    FT_Matrix matrix = {(int) ((1.0 / HRES) * 0x10000L),
+                        (int) ((0.0) * 0x10000L), (int) ((0.0) * 0x10000L),
+                        (int) ((1.0) * 0x10000L)};
 
     assert(library);
     assert(size);
@@ -63,12 +65,12 @@ const struct
     /* Load face */
     switch (self->location)
     {
-    case TEXTURE_FONT_FILE:
+    case texture_font_t::TEXTURE_FONT_FILE:
         error = FT_New_Face(*library, self->filename, 0, face);
         break;
 
-    case TEXTURE_FONT_MEMORY:
-        error = FT_New_Memory_Face(*library, self->memory.base,
+    case texture_font_t::TEXTURE_FONT_MEMORY:
+        error = FT_New_Memory_Face(*library, (const FT_Byte *)self->memory.base,
                                    self->memory.size, 0, face);
         break;
     }
@@ -104,11 +106,11 @@ const struct
 
     return 1;
 
-cleanup_face:
+    cleanup_face:
     FT_Done_Face(*face);
-cleanup_library:
+    cleanup_library:
     FT_Done_FreeType(*library);
-cleanup:
+    cleanup:
     return 0;
 }
 
@@ -123,20 +125,20 @@ texture_glyph_t *texture_glyph_new(void)
         return NULL;
     }
 
-    self->codepoint         = -1;
-    self->width             = 0;
-    self->height            = 0;
-    self->rendermode        = RENDER_NORMAL;
+    self->codepoint = -1;
+    self->width = 0;
+    self->height = 0;
+    self->rendermode = RENDER_NORMAL;
     self->outline_thickness = 0.0;
-    self->offset_x          = 0;
-    self->offset_y          = 0;
-    self->advance_x         = 0.0;
-    self->advance_y         = 0.0;
-    self->s0                = 0.0;
-    self->t0                = 0.0;
-    self->s1                = 0.0;
-    self->t1                = 0.0;
-    self->kerning           = vector_new(sizeof(kerning_t));
+    self->offset_x = 0;
+    self->offset_y = 0;
+    self->advance_x = 0.0;
+    self->advance_y = 0.0;
+    self->s0 = 0.0;
+    self->t0 = 0.0;
+    self->s1 = 0.0;
+    self->t1 = 0.0;
+    self->kerning = vector_new(sizeof(kerning_t));
     return self;
 }
 
@@ -182,7 +184,7 @@ void texture_font_generate_kerning(texture_font_t *self, FT_Library *library,
     /* Starts at index 1 since 0 is for the special backgroudn glyph */
     for (i = 1; i < self->glyphs->size; ++i)
     {
-        glyph       = *(texture_glyph_t **) vector_get(self->glyphs, i);
+        glyph = *(texture_glyph_t **) vector_get(self->glyphs, i);
         glyph_index = FT_Get_Char_Index(*face, glyph->codepoint);
         vector_clear(glyph->kerning);
 
@@ -197,8 +199,8 @@ void texture_font_generate_kerning(texture_font_t *self, FT_Library *library,
             //       glyph_index, glyph_index, kerning.x);
             if (kerning.x)
             {
-                kerning_t k = { prev_glyph->codepoint,
-                                kerning.x / (float) (HRESf * HRESf) };
+                kerning_t k = {prev_glyph->codepoint,
+                               kerning.x / (float) (HRESf * HRESf)};
                 vector_push_back(glyph->kerning, &k);
             }
         }
@@ -214,19 +216,19 @@ static int texture_font_init(texture_font_t *self)
 
     assert(self->atlas);
     assert(self->size > 0);
-    assert((self->location == TEXTURE_FONT_FILE && self->filename) ||
-           (self->location == TEXTURE_FONT_MEMORY && self->memory.base &&
+    assert((self->location == texture_font_t::TEXTURE_FONT_FILE && self->filename) ||
+           (self->location == texture_font_t::TEXTURE_FONT_MEMORY && self->memory.base &&
             self->memory.size));
 
-    self->glyphs            = vector_new(sizeof(texture_glyph_t *));
-    self->height            = 0;
-    self->ascender          = 0;
-    self->descender         = 0;
-    self->rendermode        = RENDER_NORMAL;
+    self->glyphs = vector_new(sizeof(texture_glyph_t *));
+    self->height = 0;
+    self->ascender = 0;
+    self->descender = 0;
+    self->rendermode = RENDER_NORMAL;
     self->outline_thickness = 0.0;
-    self->hinting           = 1;
-    self->kerning           = 1;
-    self->filtering         = 1;
+    self->hinting = 1;
+    self->kerning = 1;
+    self->filtering = 1;
 
     // FT_LCD_FILTER_LIGHT   is (0x00, 0x55, 0x56, 0x55, 0x00)
     // FT_LCD_FILTER_DEFAULT is (0x10, 0x40, 0x70, 0x40, 0x10)
@@ -240,7 +242,7 @@ static int texture_font_init(texture_font_t *self)
         return -1;
 
     self->underline_position =
-        face->underline_position / (float) (HRESf * HRESf) * self->size;
+            face->underline_position / (float) (HRESf * HRESf) * self->size;
     self->underline_position = roundf(self->underline_position);
     if (self->underline_position > -2)
     {
@@ -248,18 +250,18 @@ static int texture_font_init(texture_font_t *self)
     }
 
     self->underline_thickness =
-        face->underline_thickness / (float) (HRESf * HRESf) * self->size;
+            face->underline_thickness / (float) (HRESf * HRESf) * self->size;
     self->underline_thickness = roundf(self->underline_thickness);
     if (self->underline_thickness < 1)
     {
         self->underline_thickness = 1.0;
     }
 
-    metrics         = face->size->metrics;
-    self->ascender  = (metrics.ascender >> 6) / 100.0;
+    metrics = face->size->metrics;
+    self->ascender = (metrics.ascender >> 6) / 100.0;
     self->descender = (metrics.descender >> 6) / 100.0;
-    self->height    = (metrics.height >> 6) / 100.0;
-    self->linegap   = self->height - self->ascender + self->descender;
+    self->height = (metrics.height >> 6) / 100.0;
+    self->linegap = self->height - self->ascender + self->descender;
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 
@@ -278,7 +280,7 @@ texture_font_t *texture_font_new_from_file(texture_atlas_t *atlas,
 
     assert(filename);
 
-    self = calloc(1, sizeof(*self));
+    self = (texture_font_t *)calloc(1, sizeof(*self));
     if (!self)
     {
         fprintf(stderr, "line %d: No more memory for allocating data\n",
@@ -287,9 +289,9 @@ texture_font_t *texture_font_new_from_file(texture_atlas_t *atlas,
     }
 
     self->atlas = atlas;
-    self->size  = pt_size;
+    self->size = pt_size;
 
-    self->location = TEXTURE_FONT_FILE;
+    self->location = texture_font_t::TEXTURE_FONT_FILE;
     self->filename = strdup(filename);
 
     if (texture_font_init(self))
@@ -312,7 +314,7 @@ texture_font_t *texture_font_new_from_memory(texture_atlas_t *atlas,
     assert(memory_base);
     assert(memory_size);
 
-    self = calloc(1, sizeof(*self));
+    self = (texture_font_t *)calloc(1, sizeof(*self));
     if (!self)
     {
         fprintf(stderr, "line %d: No more memory for allocating data\n",
@@ -321,9 +323,9 @@ texture_font_t *texture_font_new_from_memory(texture_atlas_t *atlas,
     }
 
     self->atlas = atlas;
-    self->size  = pt_size;
+    self->size = pt_size;
 
-    self->location    = TEXTURE_FONT_MEMORY;
+    self->location = texture_font_t::TEXTURE_FONT_MEMORY;
     self->memory.base = memory_base;
     self->memory.size = memory_size;
 
@@ -344,7 +346,7 @@ void texture_font_delete(texture_font_t *self)
 
     assert(self);
 
-    if (self->location == TEXTURE_FONT_FILE && self->filename)
+    if (self->location == texture_font_t::TEXTURE_FONT_FILE && self->filename)
         free(self->filename);
 
     for (i = 0; i < vector_size(self->glyphs); ++i)
@@ -394,8 +396,8 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
 
     FT_UInt glyph_index;
     texture_glyph_t *glyph;
-    FT_Int32 flags    = 0;
-    int ft_glyph_top  = 0;
+    FT_Int32 flags = 0;
+    int ft_glyph_top = 0;
     int ft_glyph_left = 0;
 
     ivec4 region;
@@ -417,13 +419,9 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
      */
     if (!codepoint)
     {
-        ivec4 region           = texture_atlas_get_region(self->atlas, 5, 5);
+        ivec4 region = texture_atlas_get_region(self->atlas, 5, 5);
         texture_glyph_t *glyph = texture_glyph_new();
-        static unsigned char data[4 * 4 * 3] = {
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-        };
+        static unsigned char data[4 * 4 * 3] = { 255 };
         if (region.x < 0)
         {
             fprintf(stderr, "Texture atlas is full (line %d)\n", __LINE__);
@@ -434,10 +432,10 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
         texture_atlas_set_region(self->atlas, region.x, region.y, 4, 4, data,
                                  0);
         glyph->codepoint = -1;
-        glyph->s0        = (region.x + 2) / (float) self->atlas->width;
-        glyph->t0        = (region.y + 2) / (float) self->atlas->height;
-        glyph->s1        = (region.x + 3) / (float) self->atlas->width;
-        glyph->t1        = (region.y + 3) / (float) self->atlas->height;
+        glyph->s0 = (region.x + 2) / (float) self->atlas->width;
+        glyph->t0 = (region.y + 2) / (float) self->atlas->height;
+        glyph->s1 = (region.x + 3) / (float) self->atlas->width;
+        glyph->t1 = (region.y + 3) / (float) self->atlas->height;
         vector_push_back(self->glyphs, &glyph);
 
         FT_Done_Face(face);
@@ -445,8 +443,8 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
         return 1;
     }
 
-    flags         = 0;
-    ft_glyph_top  = 0;
+    flags = 0;
+    ft_glyph_top = 0;
     ft_glyph_left = 0;
     glyph_index = FT_Get_Char_Index(face, (FT_ULong) utf8_to_utf32(codepoint));
     // WARNING: We use texture-atlas depth to guess if user wants
@@ -456,8 +454,7 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
         self->rendermode != RENDER_SIGNED_DISTANCE_FIELD)
     {
         flags |= FT_LOAD_NO_BITMAP;
-    }
-    else
+    } else
     {
         flags |= FT_LOAD_RENDER;
     }
@@ -465,8 +462,7 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
     if (!self->hinting)
     {
         flags |= FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT;
-    }
-    else
+    } else
     {
         flags |= FT_LOAD_FORCE_AUTOHINT;
     }
@@ -495,12 +491,11 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
     if (self->rendermode == RENDER_NORMAL ||
         self->rendermode == RENDER_SIGNED_DISTANCE_FIELD)
     {
-        slot          = face->glyph;
-        ft_bitmap     = slot->bitmap;
-        ft_glyph_top  = slot->bitmap_top;
+        slot = face->glyph;
+        ft_bitmap = slot->bitmap;
+        ft_glyph_top = slot->bitmap_top;
         ft_glyph_left = slot->bitmap_left;
-    }
-    else
+    } else
     {
         FT_Stroker stroker;
         FT_BitmapGlyph ft_bitmap_glyph;
@@ -553,11 +548,11 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
         }
 
         ft_bitmap_glyph = (FT_BitmapGlyph) ft_glyph;
-        ft_bitmap       = ft_bitmap_glyph->bitmap;
-        ft_glyph_top    = ft_bitmap_glyph->top;
-        ft_glyph_left   = ft_bitmap_glyph->left;
+        ft_bitmap = ft_bitmap_glyph->bitmap;
+        ft_glyph_top = ft_bitmap_glyph->top;
+        ft_glyph_left = ft_bitmap_glyph->left;
 
-    cleanup_stroker:
+        cleanup_stroker:
         FT_Stroker_Done(stroker);
 
         if (error)
@@ -574,11 +569,11 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
         int top;
         int right;
         int bottom;
-    } padding = { 0, 0, 1, 1 };
+    } padding = {0, 0, 1, 1};
 
     if (self->rendermode == RENDER_SIGNED_DISTANCE_FIELD)
     {
-        padding.top  = 1;
+        padding.top = 1;
         padding.left = 1;
     }
 
@@ -602,10 +597,10 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
     y = region.y;
 
     unsigned char *buffer =
-        calloc(tgt_w * tgt_h * self->atlas->depth, sizeof(unsigned char));
+            (unsigned char *)calloc(tgt_w * tgt_h * self->atlas->depth, sizeof(unsigned char));
 
     unsigned char *dst_ptr =
-        buffer + (padding.top * tgt_w + padding.left) * self->atlas->depth;
+            buffer + (padding.top * tgt_w + padding.left) * self->atlas->depth;
     unsigned char *src_ptr = ft_bitmap.buffer;
     for (i = 0; i < src_h; i++)
     {
@@ -628,22 +623,22 @@ int texture_font_load_glyph(texture_font_t *self, const char *codepoint)
 
     free(buffer);
 
-    glyph                    = texture_glyph_new();
-    glyph->codepoint         = utf8_to_utf32(codepoint);
-    glyph->width             = tgt_w;
-    glyph->height            = tgt_h;
-    glyph->rendermode        = self->rendermode;
+    glyph = texture_glyph_new();
+    glyph->codepoint = utf8_to_utf32(codepoint);
+    glyph->width = tgt_w;
+    glyph->height = tgt_h;
+    glyph->rendermode = self->rendermode;
     glyph->outline_thickness = self->outline_thickness;
-    glyph->offset_x          = ft_glyph_left;
-    glyph->offset_y          = ft_glyph_top;
-    glyph->s0                = x / (float) self->atlas->width;
-    glyph->t0                = y / (float) self->atlas->height;
-    glyph->s1                = (x + glyph->width) / (float) self->atlas->width;
+    glyph->offset_x = ft_glyph_left;
+    glyph->offset_y = ft_glyph_top;
+    glyph->s0 = x / (float) self->atlas->width;
+    glyph->t0 = y / (float) self->atlas->height;
+    glyph->s1 = (x + glyph->width) / (float) self->atlas->width;
     glyph->t1 = (y + glyph->height) / (float) self->atlas->height;
 
     // Discard hinting to get advance
     FT_Load_Glyph(face, glyph_index, FT_LOAD_RENDER | FT_LOAD_NO_HINTING);
-    slot             = face->glyph;
+    slot = face->glyph;
     glyph->advance_x = slot->advance.x / HRESf;
     glyph->advance_y = slot->advance.y / HRESf;
 
@@ -709,13 +704,13 @@ void texture_font_enlarge_atlas(texture_font_t *self, size_t width_new,
     assert(height_new >= self->atlas->height);
     assert(width_new + height_new > self->atlas->width + self->atlas->height);
     texture_atlas_t *ta = self->atlas;
-    size_t width_old    = ta->width;
-    size_t height_old   = ta->height;
+    size_t width_old = ta->width;
+    size_t height_old = ta->height;
     // allocate new buffer
     unsigned char *data_old = ta->data;
-    ta->data = calloc(1, width_new * height_new * sizeof(char) * ta->depth);
+    ta->data = (unsigned char *)calloc(1, width_new * height_new * sizeof(char) * ta->depth);
     // update atlas size
-    ta->width  = width_new;
+    ta->width = width_new;
     ta->height = height_new;
     // add node reflecting the gained space on the right
     if (width_new > width_old)
@@ -728,7 +723,7 @@ void texture_font_enlarge_atlas(texture_font_t *self, size_t width_new,
     }
     // copy over data from the old buffer, skipping first row and column because
     // of the margin
-    size_t pixel_size   = sizeof(char) * ta->depth;
+    size_t pixel_size = sizeof(char) * ta->depth;
     size_t old_row_size = width_old * pixel_size;
     texture_atlas_set_region(ta, 1, 1, width_old - 2, height_old - 2,
                              data_old + old_row_size + pixel_size,
@@ -746,4 +741,6 @@ void texture_font_enlarge_atlas(texture_font_t *self, size_t width_new,
         g->t0 *= mulh;
         g->t1 *= mulh;
     }
+}
+
 }

@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-#include "vertex-buffer.h"
-#include "markup.h"
+#include "vertex-buffer.hpp"
+#include "markup.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

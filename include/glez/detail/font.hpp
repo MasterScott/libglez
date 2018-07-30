@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <freetype-gl.h>
+#include <freetype-gl.hpp>
 #include <limits>
 #include <string>
 

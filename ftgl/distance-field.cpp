@@ -7,18 +7,21 @@
 #include <float.h>
 #include <stdlib.h>
 #include <string.h>
-#include "edtaa3func.h"
+#include "edtaa3func.hpp"
+
+namespace ftgl
+{
 
 double *make_distance_mapd(double *data, unsigned int width,
                            unsigned int height)
 {
-    short *xdist    = (short *) malloc(width * height * sizeof(short));
-    short *ydist    = (short *) malloc(width * height * sizeof(short));
-    double *gx      = (double *) calloc(width * height, sizeof(double));
-    double *gy      = (double *) calloc(width * height, sizeof(double));
+    short *xdist = (short *) malloc(width * height * sizeof(short));
+    short *ydist = (short *) malloc(width * height * sizeof(short));
+    double *gx = (double *) calloc(width * height, sizeof(double));
+    double *gy = (double *) calloc(width * height, sizeof(double));
     double *outside = (double *) calloc(width * height, sizeof(double));
-    double *inside  = (double *) calloc(width * height, sizeof(double));
-    double vmin     = DBL_MAX;
+    double *inside = (double *) calloc(width * height, sizeof(double));
+    double vmin = DBL_MAX;
     unsigned int i;
 
     // Compute outside = edtaa3(bitmap); % Transform background (0's)
@@ -73,7 +76,7 @@ unsigned char *make_distance_mapb(unsigned char *img, unsigned int width,
 {
     double *data = (double *) calloc(width * height, sizeof(double));
     unsigned char *out =
-        (unsigned char *) malloc(width * height * sizeof(unsigned char));
+            (unsigned char *) malloc(width * height * sizeof(unsigned char));
     unsigned int i;
 
     // find minimimum and maximum values
@@ -83,7 +86,7 @@ unsigned char *make_distance_mapb(unsigned char *img, unsigned int width,
     for (i = 0; i < width * height; ++i)
     {
         double v = img[i];
-        data[i]  = v;
+        data[i] = v;
         if (v > img_max)
             img_max = v;
         if (v < img_min)
@@ -103,4 +106,6 @@ unsigned char *make_distance_mapb(unsigned char *img, unsigned int width,
     free(data);
 
     return out;
+}
+
 }

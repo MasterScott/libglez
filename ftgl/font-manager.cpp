@@ -12,7 +12,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "font-manager.h"
+#include "font-manager.hpp"
+
+namespace ftgl
+{
 
 // ------------------------------------------------------------ file_exists ---
 static int file_exists(const char *filename)
@@ -31,7 +34,7 @@ font_manager_t *font_manager_new(size_t width, size_t height, size_t depth)
 {
     font_manager_t *self;
     texture_atlas_t *atlas = texture_atlas_new(width, height, depth);
-    self                   = (font_manager_t *) malloc(sizeof(font_manager_t));
+    self = (font_manager_t *) malloc(sizeof(font_manager_t));
     if (!self)
     {
         fprintf(stderr, "line %d: No more memory for allocating data\n",
@@ -131,8 +134,7 @@ texture_font_t *font_manager_get_from_description(font_manager_t *self,
     if (file_exists(family))
     {
         filename = strdup(family);
-    }
-    else
+    } else
     {
 #if defined(_WIN32) || defined(_WIN64)
         fprintf(stderr,
@@ -140,13 +142,14 @@ texture_font_t *font_manager_get_from_description(font_manager_t *self,
         return 0;
 #endif
         filename =
-            font_manager_match_description(self, family, size, bold, italic);
+                font_manager_match_description(self, family, size, bold,
+                                               italic);
         if (!filename)
         {
             fprintf(
-                stderr,
-                "No \"%s (size=%.1f, bold=%d, italic=%d)\" font available.\n",
-                family, size, bold, italic);
+                    stderr,
+                    "No \"%s (size=%.1f, bold=%d, italic=%d)\" font available.\n",
+                    family, size, bold, italic);
             return 0;
         }
     }
@@ -228,4 +231,6 @@ char *font_manager_match_description(font_manager_t *self, const char *family,
     FcPatternDestroy(match);
     return filename;
 #endif
+}
+
 }

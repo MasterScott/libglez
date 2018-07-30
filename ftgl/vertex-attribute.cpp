@@ -7,9 +7,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "vec234.h"
-#include "platform.h"
-#include "vertex-attribute.h"
+#include "vec234.hpp"
+#include "platform.hpp"
+#include "vertex-attribute.hpp"
+
+namespace ftgl
+{
 
 // ----------------------------------------------------------------------------
 vertex_attribute_t *vertex_attribute_new(GLchar *name, GLint size, GLenum type,
@@ -17,17 +20,17 @@ vertex_attribute_t *vertex_attribute_new(GLchar *name, GLint size, GLenum type,
                                          GLvoid *pointer)
 {
     vertex_attribute_t *attribute =
-        (vertex_attribute_t *) malloc(sizeof(vertex_attribute_t));
+            (vertex_attribute_t *) malloc(sizeof(vertex_attribute_t));
 
     assert(size > 0);
 
-    attribute->name       = (GLchar *) strdup(name);
-    attribute->index      = -1;
-    attribute->size       = size;
-    attribute->type       = type;
+    attribute->name = (GLchar *) strdup(name);
+    attribute->index = -1;
+    attribute->size = size;
+    attribute->type = type;
     attribute->normalized = normalized;
-    attribute->stride     = stride;
-    attribute->pointer    = pointer;
+    attribute->stride = stride;
+    attribute->pointer = pointer;
     return attribute;
 }
 
@@ -76,8 +79,7 @@ vertex_attribute_t *vertex_attribute_parse(char *format)
                 normalized = 1;
             }
         }
-    }
-    else
+    } else
     {
         fprintf(stderr, "Vertex attribute format not understood ('%s')\n",
                 format);
@@ -150,4 +152,6 @@ void vertex_attribute_enable(vertex_attribute_t *attr)
         glVertexAttribPointer(attr->index, attr->size, attr->type,
                               attr->normalized, attr->stride, attr->pointer);
     }
+}
+
 }

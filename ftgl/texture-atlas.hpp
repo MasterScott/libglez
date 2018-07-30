@@ -24,8 +24,8 @@
 extern "C" {
 #endif
 
-#include "vector.h"
-#include "vec234.h"
+#include "vector.hpp"
+#include "vec234.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

@@ -6,7 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "mat4.h"
+#include "mat4.hpp"
+
+namespace ftgl
+{
 
 mat4 *mat4_new(void)
 {
@@ -135,8 +138,8 @@ void mat4_set_rotation(mat4 *self, float angle, float x, float y, float z)
     if (!self)
         return;
 
-    c    = (float) cos(M_PI * angle / 180.0);
-    s    = (float) sin(M_PI * angle / 180.0);
+    c = (float) cos(M_PI * angle / 180.0);
+    s = (float) sin(M_PI * angle / 180.0);
     norm = (float) sqrt(x * x + y * y + z * z);
 
     x /= norm;
@@ -211,4 +214,6 @@ void mat4_scale(mat4 *self, float x, float y, float z)
 
     mat4_set_scaling(&m, x, y, z);
     mat4_multiply(self, &m);
+}
+
 }

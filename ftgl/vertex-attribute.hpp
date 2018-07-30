@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-#include "opengl.h"
-#include "vector.h"
+#include "opengl.hpp"
+#include "vector.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

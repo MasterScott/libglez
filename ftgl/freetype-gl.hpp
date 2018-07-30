@@ -7,11 +7,11 @@
 #define __FREETYPE_GL_H__
 
 /* Mandatory */
-#include "opengl.h"
-#include "vec234.h"
-#include "vector.h"
-#include "texture-atlas.h"
-#include "texture-font.h"
+#include "opengl.hpp"
+#include "vec234.hpp"
+#include "vector.hpp"
+#include "texture-atlas.hpp"
+#include "texture-font.hpp"
 
 #ifdef __cplusplus
 #ifndef NOT_USING_FT_GL_NAMESPACE

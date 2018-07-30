@@ -4,7 +4,10 @@
  * file `LICENSE` for more details.
  */
 #include <string.h>
-#include "utf8-utils.h"
+#include "utf8-utils.hpp"
+
+namespace ftgl
+{
 
 // ----------------------------------------------------- utf8_surrogate_len ---
 size_t utf8_surrogate_len(const char *character)
@@ -33,7 +36,7 @@ size_t utf8_surrogate_len(const char *character)
 size_t utf8_strlen(const char *string)
 {
     const char *ptr = string;
-    size_t result   = 0;
+    size_t result = 0;
 
     while (*ptr)
     {
@@ -46,37 +49,46 @@ size_t utf8_strlen(const char *string)
 
 uint32_t utf8_to_utf32(const char *character)
 {
-    uint32_t result = -1;
-
     if (!character)
     {
-        return result;
+        return 0xFFFFFFFF;
     }
 
-    if ((character[0] & 0x80) == 0x0)
+    uint32_t result{0xFFFFFFFF};
+
+    /*
+     *  0000
+     *  1000 8
+     *  1100 C
+     *  1110 E
+     *  1111 F
+     *  11111 F8
+     */
+
+    if (!(character[0] & 0x80))
     {
-        result = character[0];
+        return (uint32_t) character[0];
     }
 
-    if ((character[0] & 0xC0) == 0xC0)
+    if (character[0] & 0x40)
     {
         result = ((character[0] & 0x3F) << 6) | (character[1] & 0x3F);
     }
 
-    if ((character[0] & 0xE0) == 0xE0)
+    if ((character[0] & 0x60) == 0x60)
     {
         result = ((character[0] & 0x1F) << (6 + 6)) |
                  ((character[1] & 0x3F) << 6) | (character[2] & 0x3F);
     }
 
-    if ((character[0] & 0xF0) == 0xF0)
+    if ((character[0] & 0x70) == 0x70)
     {
         result = ((character[0] & 0x0F) << (6 + 6 + 6)) |
                  ((character[1] & 0x3F) << (6 + 6)) |
                  ((character[2] & 0x3F) << 6) | (character[3] & 0x3F);
     }
 
-    if ((character[0] & 0xF8) == 0xF8)
+    if ((character[0] & 0x78) == 0x78)
     {
         result = ((character[0] & 0x07) << (6 + 6 + 6 + 6)) |
                  ((character[1] & 0x3F) << (6 + 6 + 6)) |
@@ -85,4 +97,6 @@ uint32_t utf8_to_utf32(const char *character)
     }
 
     return result;
+}
+
 }

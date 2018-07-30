@@ -10,9 +10,9 @@
 extern "C" {
 #endif
 
-#include "opengl.h"
-#include "vector.h"
-#include "vertex-attribute.h"
+#include "opengl.hpp"
+#include "vector.hpp"
+#include "vertex-attribute.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

@@ -7,7 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "vector.h"
+#include "vector.hpp"
+
+namespace ftgl
+{
 
 // ------------------------------------------------------------- vector_new ---
 vector_t *vector_new(size_t item_size)
@@ -22,9 +25,9 @@ vector_t *vector_new(size_t item_size)
         exit(EXIT_FAILURE);
     }
     self->item_size = item_size;
-    self->size      = 0;
-    self->capacity  = 1;
-    self->items     = malloc(self->item_size * self->capacity);
+    self->size = 0;
+    self->capacity = 1;
+    self->items = malloc(self->item_size * self->capacity);
     return self;
 }
 
@@ -105,7 +108,7 @@ void vector_reserve(vector_t *self, const size_t size)
 
     if (self->capacity < size)
     {
-        self->items    = realloc(self->items, size * self->item_size);
+        self->items = realloc(self->items, size * self->item_size);
         self->capacity = size;
     }
 }
@@ -216,8 +219,7 @@ void vector_resize(vector_t *self, const size_t size)
     {
         vector_reserve(self, size);
         self->size = self->capacity;
-    }
-    else
+    } else
     {
         self->size = size;
     }
@@ -253,7 +255,7 @@ void vector_insert_data(vector_t *self, const size_t index, const void *data,
         vector_reserve(self, self->size + count);
     }
     memmove((char *) (self->items) + (index + count) * self->item_size,
-            (char *) (self->items) + (index) *self->item_size,
+            (char *) (self->items) + (index) * self->item_size,
             count * self->item_size);
     memmove((char *) (self->items) + index * self->item_size, data,
             count * self->item_size);
@@ -267,4 +269,6 @@ void vector_sort(vector_t *self, int (*cmp)(const void *, const void *))
     assert(self->size);
 
     qsort(self->items, self->size, self->item_size, cmp);
+}
+
 }

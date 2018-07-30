@@ -13,8 +13,8 @@
 extern "C" {
 #endif
 
-#include "vector.h"
-#include "texture-atlas.h"
+#include "vector.hpp"
+#include "texture-atlas.hpp"
 
 #ifdef __cplusplus
 namespace ftgl

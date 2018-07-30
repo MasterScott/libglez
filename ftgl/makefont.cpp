@@ -3,10 +3,10 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#include "opengl.h"
-#include "vec234.h"
-#include "vector.h"
-#include "freetype-gl.h"
+#include "opengl.hpp"
+#include "vec234.hpp"
+#include "vector.hpp"
+#include "freetype-gl.hpp"
 
 #include <errno.h>
 #include <stdio.h>
@@ -17,6 +17,9 @@
 #else
 #define PRIzu "Iu"
 #endif
+
+namespace ftgl
+{
 
 // ------------------------------------------------------------- print help ---
 void print_help()
@@ -39,18 +42,18 @@ int main(int argc, char **argv)
                        "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
                        "`abcdefghijklmnopqrstuvwxyz{|}~";
 
-    float font_size             = 0.0;
-    const char *font_filename   = NULL;
+    float font_size = 0.0;
+    const char *font_filename = NULL;
     const char *header_filename = NULL;
-    const char *variable_name   = "font";
-    int show_help               = 0;
-    size_t texture_width        = 128;
-    rendermode_t rendermode     = RENDER_NORMAL;
+    const char *variable_name = "font";
+    int show_help = 0;
+    size_t texture_width = 128;
+    rendermode_t rendermode = RENDER_NORMAL;
     const char *rendermodes[5];
-    rendermodes[RENDER_NORMAL]                = "normal";
-    rendermodes[RENDER_OUTLINE_EDGE]          = "outline edge";
-    rendermodes[RENDER_OUTLINE_POSITIVE]      = "outline added";
-    rendermodes[RENDER_OUTLINE_NEGATIVE]      = "outline removed";
+    rendermodes[RENDER_NORMAL] = "normal";
+    rendermodes[RENDER_OUTLINE_EDGE] = "outline edge";
+    rendermodes[RENDER_OUTLINE_POSITIVE] = "outline added";
+    rendermodes[RENDER_OUTLINE_NEGATIVE] = "outline removed";
     rendermodes[RENDER_SIGNED_DISTANCE_FIELD] = "signed distance field";
 
     for (arg = 1; arg < argc; ++arg)
@@ -216,24 +219,19 @@ int main(int argc, char **argv)
             if (0 == strcmp("normal", argv[arg]))
             {
                 rendermode = RENDER_NORMAL;
-            }
-            else if (0 == strcmp("outline_edge", argv[arg]))
+            } else if (0 == strcmp("outline_edge", argv[arg]))
             {
                 rendermode = RENDER_OUTLINE_EDGE;
-            }
-            else if (0 == strcmp("outline_positive", argv[arg]))
+            } else if (0 == strcmp("outline_positive", argv[arg]))
             {
                 rendermode = RENDER_OUTLINE_POSITIVE;
-            }
-            else if (0 == strcmp("outline_negative", argv[arg]))
+            } else if (0 == strcmp("outline_negative", argv[arg]))
             {
                 rendermode = RENDER_OUTLINE_NEGATIVE;
-            }
-            else if (0 == strcmp("sdf", argv[arg]))
+            } else if (0 == strcmp("sdf", argv[arg]))
             {
                 rendermode = RENDER_SIGNED_DISTANCE_FIELD;
-            }
-            else
+            } else
             {
                 fprintf(stderr, "No valid render mode given.\n");
                 print_help();
@@ -284,7 +282,7 @@ int main(int argc, char **argv)
 
     texture_atlas_t *atlas = texture_atlas_new(texture_width, texture_width, 1);
     texture_font_t *font =
-        texture_font_new_from_file(atlas, font_size, font_filename);
+            texture_font_new_from_file(atlas, font_size, font_filename);
     font->rendermode = rendermode;
 
     size_t missed = texture_font_load_glyphs(font, font_cache);
@@ -304,13 +302,13 @@ int main(int argc, char **argv)
            100.0 * atlas->used / (float) (atlas->width * atlas->height),
            header_filename, variable_name, rendermodes[rendermode]);
 
-    size_t texture_size      = atlas->width * atlas->height * atlas->depth;
-    size_t glyph_count       = font->glyphs->size;
+    size_t texture_size = atlas->width * atlas->height * atlas->depth;
+    size_t glyph_count = font->glyphs->size;
     size_t max_kerning_count = 1;
     for (i = 0; i < glyph_count; ++i)
     {
         texture_glyph_t *glyph =
-            *(texture_glyph_t **) vector_get(font->glyphs, i);
+                *(texture_glyph_t **) vector_get(font->glyphs, i);
 
         if (vector_size(glyph->kerning) > max_kerning_count)
         {
@@ -324,63 +322,63 @@ int main(int argc, char **argv)
     // Header
     // -------------
     fprintf(
-        file,
-        "/* "
-        "======================================================================"
-        "======\n"
-        " * Freetype GL - A C OpenGL Freetype engine\n"
-        " * Platform:    Any\n"
-        " * WWW:         https://github.com/rougier/freetype-gl\n"
-        " * "
-        "----------------------------------------------------------------------"
-        "------\n"
-        " * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.\n"
-        " *\n"
-        " * Redistribution and use in source and binary forms, with or "
-        "without\n"
-        " * modification, are permitted provided that the following conditions "
-        "are met:\n"
-        " *\n"
-        " *  1. Redistributions of source code must retain the above copyright "
-        "notice,\n"
-        " *     this list of conditions and the following disclaimer.\n"
-        " *\n"
-        " *  2. Redistributions in binary form must reproduce the above "
-        "copyright\n"
-        " *     notice, this list of conditions and the following disclaimer "
-        "in the\n"
-        " *     documentation and/or other materials provided with the "
-        "distribution.\n"
-        " *\n"
-        " * THIS SOFTWARE IS PROVIDED BY NICOLAS P. ROUGIER ''AS IS'' AND ANY "
-        "EXPRESS OR\n"
-        " * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED "
-        "WARRANTIES OF\n"
-        " * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE "
-        "DISCLAIMED. IN NO\n"
-        " * EVENT SHALL NICOLAS P. ROUGIER OR CONTRIBUTORS BE LIABLE FOR ANY "
-        "DIRECT,\n"
-        " * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL "
-        "DAMAGES\n"
-        " * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR "
-        "SERVICES;\n"
-        " * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER "
-        "CAUSED AND\n"
-        " * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, "
-        "OR TORT\n"
-        " * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE "
-        "USE OF\n"
-        " * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
-        " *\n"
-        " * The views and conclusions contained in the software and "
-        "documentation are\n"
-        " * those of the authors and should not be interpreted as representing "
-        "official\n"
-        " * policies, either expressed or implied, of Nicolas P. Rougier.\n"
-        " * "
-        "======================================================================"
-        "======\n"
-        " */\n");
+            file,
+            "/* "
+            "======================================================================"
+            "======\n"
+            " * Freetype GL - A C OpenGL Freetype engine\n"
+            " * Platform:    Any\n"
+            " * WWW:         https://github.com/rougier/freetype-gl\n"
+            " * "
+            "----------------------------------------------------------------------"
+            "------\n"
+            " * Copyright 2011,2012 Nicolas P. Rougier. All rights reserved.\n"
+            " *\n"
+            " * Redistribution and use in source and binary forms, with or "
+            "without\n"
+            " * modification, are permitted provided that the following conditions "
+            "are met:\n"
+            " *\n"
+            " *  1. Redistributions of source code must retain the above copyright "
+            "notice,\n"
+            " *     this list of conditions and the following disclaimer.\n"
+            " *\n"
+            " *  2. Redistributions in binary form must reproduce the above "
+            "copyright\n"
+            " *     notice, this list of conditions and the following disclaimer "
+            "in the\n"
+            " *     documentation and/or other materials provided with the "
+            "distribution.\n"
+            " *\n"
+            " * THIS SOFTWARE IS PROVIDED BY NICOLAS P. ROUGIER ''AS IS'' AND ANY "
+            "EXPRESS OR\n"
+            " * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED "
+            "WARRANTIES OF\n"
+            " * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE "
+            "DISCLAIMED. IN NO\n"
+            " * EVENT SHALL NICOLAS P. ROUGIER OR CONTRIBUTORS BE LIABLE FOR ANY "
+            "DIRECT,\n"
+            " * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL "
+            "DAMAGES\n"
+            " * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR "
+            "SERVICES;\n"
+            " * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER "
+            "CAUSED AND\n"
+            " * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, "
+            "OR TORT\n"
+            " * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE "
+            "USE OF\n"
+            " * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
+            " *\n"
+            " * The views and conclusions contained in the software and "
+            "documentation are\n"
+            " * those of the authors and should not be interpreted as representing "
+            "official\n"
+            " * policies, either expressed or implied, of Nicolas P. Rougier.\n"
+            " * "
+            "======================================================================"
+            "======\n"
+            " */\n");
 
     // ----------------------
     // Structure declarations
@@ -442,8 +440,7 @@ int main(int argc, char **argv)
             if ((j + i) < (texture_size - 1))
             {
                 fprintf(file, "%d,", atlas->data[i + j]);
-            }
-            else
+            } else
             {
                 fprintf(file, "%d", atlas->data[i + j]);
             }
@@ -469,7 +466,7 @@ int main(int argc, char **argv)
     for (i = 0; i < glyph_count; ++i)
     {
         texture_glyph_t *glyph =
-            *(texture_glyph_t **) vector_get(font->glyphs, i);
+                *(texture_glyph_t **) vector_get(font->glyphs, i);
 
         /*
                 // Debugging information
@@ -515,14 +512,13 @@ int main(int argc, char **argv)
         if (vector_size(glyph->kerning) == 0)
         {
             fprintf(file, "0");
-        }
-        else
+        } else
         {
             fprintf(file, "{ ");
             for (j = 0; j < vector_size(glyph->kerning); ++j)
             {
                 kerning_t *kerning =
-                    (kerning_t *) vector_get(glyph->kerning, j);
+                        (kerning_t *) vector_get(glyph->kerning, j);
 
                 fprintf(file, "{%u, %ff}", kerning->codepoint,
                         kerning->kerning);
@@ -542,4 +538,6 @@ int main(int argc, char **argv)
                   "#endif\n");
     fclose(file);
     return 0;
+}
+
 }
