@@ -9,7 +9,6 @@
 /* Mandatory */
 #include "opengl.hpp"
 #include "vec234.hpp"
-#include "vector.hpp"
 #include "texture-atlas.hpp"
 #include "texture-font.hpp"
 

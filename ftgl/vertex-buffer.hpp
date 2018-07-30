@@ -6,7 +6,6 @@
 #pragma once
 
 #include "opengl.hpp"
-#include "vector.hpp"
 #include "vertex-attribute.hpp"
 
 namespace ftgl

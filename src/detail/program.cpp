@@ -105,9 +105,9 @@ ftgl::vertex_buffer_t *buffer{ nullptr };
 void resize(int width, int height)
 {
     glUseProgram(shader);
-    ftgl::mat4 projection;
-    mat4_set_identity(&projection);
-    mat4_set_orthographic(&projection, 0, width, height, 0, -1, 1);
+    ftgl::mat4 projection{};
+    projection.set_identity();
+    projection.set_orthographic(0, width, height, 0, -1, 1);
     glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, 0,
                        projection.data);
     glUseProgram(0);

@@ -21,7 +21,8 @@ namespace ftgl
  * <b>icount</b>
  *
  */
-typedef union {
+union ivec4
+{
     int data[4]; /**< All compoments at once     */
     struct
     {
@@ -58,7 +59,7 @@ typedef union {
         int istart; /**< Alias for third component  */
         int icount; /**< Alias for fourth component */
     };
-} ivec4;
+};
 
 /**
  * Tuple of 3 ints.
@@ -69,7 +70,8 @@ typedef union {
  *  - Third component:  <b>z</b>, <b>b</b> or <b>blue</b>
  *
  */
-typedef union {
+union ivec3
+{
     int data[3]; /**< All compoments at once     */
     struct
     {
@@ -89,7 +91,7 @@ typedef union {
         int green; /**< Alias for second component */
         int blue;  /**< Alias for third component  */
     };
-} ivec3;
+};
 
 /**
  * Tuple of 2 ints.
@@ -99,7 +101,8 @@ typedef union {
  *  - Second component: <b>y</b>, <b>t</b> or <b>end</b>
  *
  */
-typedef union {
+union ivec2
+{
     int data[2]; /**< All compoments at once     */
     struct
     {
@@ -116,7 +119,7 @@ typedef union {
         int start; /**< Alias for first component  */
         int end;   /**< Alias for second component */
     };
-} ivec2;
+};
 
 /**
  * Tuple of 4 floats.
@@ -127,7 +130,8 @@ typedef union {
  *  - Third component:  <b>z</b>, <b>width</b>, <b>b</b> or <b>blue</b>
  *  - Fourth component: <b>w</b>, <b>height</b>, <b>a</b> or <b>alpha</b>
  */
-typedef union {
+union vec4
+{
     float data[4]; /**< All compoments at once    */
     struct
     {
@@ -157,7 +161,7 @@ typedef union {
         float blue;  /**< Alias for third component  */
         float alpha; /**< Alias for fourth component */
     };
-} vec4;
+};
 
 /**
  * Tuple of 3 floats
@@ -167,7 +171,8 @@ typedef union {
  *  - Second component: <b>y</b>, <b>g</b> or <b>green</b>
  *  - Third component:  <b>z</b>, <b>b</b> or <b>blue</b>
  */
-typedef union {
+union vec3
+{
     float data[3]; /**< All compoments at once    */
     struct
     {
@@ -187,7 +192,7 @@ typedef union {
         float green; /**< Alias fo second component */
         float blue;  /**< Alias fo third component  */
     };
-} vec3;
+};
 
 /**
  * Tuple of 2 floats
@@ -196,7 +201,8 @@ typedef union {
  *  - First component:  <b>x</b> or <b>s</b>
  *  - Second component: <b>y</b> or <b>t</b>
  */
-typedef union {
+union vec2
+{
     float data[2]; /**< All components at once     */
     struct
     {
@@ -208,6 +214,6 @@ typedef union {
         float s; /**< Alias for first component  */
         float t; /**< Alias for second component */
     };
-} vec2;
+};
 
 }
