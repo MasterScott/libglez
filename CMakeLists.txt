@@ -16,6 +16,7 @@ set(lib_dest "${export_dest}/${CMAKE_BUILD_TYPE}")
 
 find_package(PNG REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(PNG REQUIRED)
 
 
 add_library(${PROJECT_NAME} STATIC "")
@@ -41,7 +42,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${PNG_DEFINITIONS})
 
-target_link_libraries(${PROJECT_NAME} ${PNG_LIBRARIES} ${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/freetype/lib/libfreetype.a z GL)
+target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/freetype/lib/libfreetype.a png z fontconfig GL)
 
 #add_subdirectory(src)
 #add_subdirectory(include/glez)

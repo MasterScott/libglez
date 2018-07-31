@@ -4,6 +4,8 @@
  * file `LICENSE` for more details.
  */
 
+#pragma once
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -426,7 +428,7 @@ size_t VertexBuffer<Vertex>::insert(size_t index, const Vertex *vertices, size_t
     }
 
     // Insert item
-    items.emplace(items.begin() + index, { vstart, vcount, istart, icount });
+    items.emplace(items.begin() + index, ivec4 { vstart, vcount, istart, icount });
 
     state = DIRTY;
     return index;

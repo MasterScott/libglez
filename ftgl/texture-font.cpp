@@ -419,7 +419,7 @@ void TextureFont::enlarge_atlas(size_t width_new, size_t height_new)
     // add node reflecting the gained space on the right
     if (width_new > width_old)
     {
-        atlas.nodes.emplace_back(width_old - 1, 1, width_new - width_old);
+        atlas.nodes.emplace_back(ivec3 {(int)width_old - 1, 1, (int)width_new - (int)width_old});
     }
     // copy over data from the old buffer, skipping first row and column because
     // of the margin

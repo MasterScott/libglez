@@ -31,6 +31,7 @@ namespace ftgl
  template<typename Vertex>
 class VertexBuffer
 {
+public:
     using vertex_type = Vertex;
 
     static_assert(std::is_pod<Vertex>::value);
@@ -47,8 +48,7 @@ class VertexBuffer
      *
      * @param  format a string describing vertex format.
      */
-    explicit VertexBuffer(std::string format);
-
+    explicit VertexBuffer(std::string fmt);
 
     /**
      * Deletes vertex buffer and releases GPU memory.
