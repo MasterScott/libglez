@@ -7,66 +7,65 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <font-manager.hpp>
 
-static std::unique_ptr<std::vector<glez::detail::font::font>> cache{ nullptr };
+static std::unique_ptr<ftgl::FontManager> manager{};
+static bool init_done{ false };
+
+static void init()
+{
+    manager = std::make_unique<ftgl::FontManager>(1024, 1024, 1);
+    init_done = true;
+}
 
 namespace glez::detail::font
 {
 
-void init()
+font::~font()
 {
-    cache = std::make_unique<std::vector<font>>();
+    if (texture)
+    {
+        manager->delete_font(*texture);
+    }
+    texture.reset(nullptr);
 }
 
-void shutdown()
+bool font::load(const std::string &path, float size)
 {
-    cache.reset(nullptr);
+    if (!init_done)
+        init();
+    return internalLoad(manager->get_from_filename(path, size));
 }
 
-void font::load(const std::string &path, float size)
+bool font::loadFamily(std::string family, float size, bool bold, bool italic)
 {
-    assert(size > 0);
-
-    atlas = ftgl::texture_atlas_new(1024, 1024, 1);
-    assert(atlas != nullptr);
-
-    font = texture_font_new_from_file(atlas, size, path.c_str());
-    assert(font != nullptr);
-
-    init = true;
-}
-
-void font::unload()
-{
-    if (!init)
-        return;
-
-    texture_atlas_delete(atlas);
-    texture_font_delete(font);
-    init = false;
+    if (!init_done)
+        init();
+    return internalLoad(manager->get_from_description(std::move(family), size, bold, italic));
 }
 
 void font::stringSize(const std::string &string, float *width, float *height)
 {
-    
+    if (!texture)
+        return;
 
     float penX = 0;
 
     float size_x = 0;
     float size_y = 0;
 
-    texture_font_load_glyphs(font, string.c_str());
+    texture->load_glyphs(string.c_str());
 
     const char *sstring = string.c_str();
 
     for (size_t i = 0; i < string.size(); ++i)
     {
         // c_str guarantees a NULL terminator
-        ftgl::texture_glyph_t *glyph = texture_font_find_glyph(font, &sstring[i]);
+        auto glyph = texture->find_glyph(&sstring[i]);
         if (glyph == nullptr)
             continue;
 
-        penX += texture_glyph_get_kerning(glyph, &sstring[i]);
+        penX += glyph->get_kerning(&sstring[i]);
         penX += glyph->advance_x;
 
         if (penX > size_x)
@@ -81,18 +80,15 @@ void font::stringSize(const std::string &string, float *width, float *height)
         *height = size_y;
 }
 
-unsigned create()
+bool font::internalLoad(ftgl::TextureFont *font)
 {
-    for (auto i = 0u; i < cache->size(); ++i)
-        if (not(*cache)[i].init)
-            return i;
-    auto result = cache->size();
-    cache->push_back(font{});
-    return result;
+    if (font == nullptr)
+    {
+        error = true;
+        return false;
+    }
+    texture.reset(font);
+    return true;
 }
 
-font &get(unsigned handle)
-{
-    return (*cache)[handle];
-}
 }

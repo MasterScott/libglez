@@ -44,8 +44,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE ${PNG_DEFINITIONS})
 
 target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/freetype/lib/libfreetype.a png z fontconfig GL)
 
-#add_subdirectory(src)
-#add_subdirectory(include/glez)
+add_subdirectory(src)
+add_subdirectory(include/glez)
 add_subdirectory(ftgl)
 
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION "${lib_dest}")

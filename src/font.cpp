@@ -9,31 +9,38 @@
 namespace glez
 {
 
-font::~font()
-{
-    if (loaded)
-        unload();
-}
-
 void font::load()
 {
-    handle     = detail::font::create();
-    auto &font = detail::font::get(handle);
+    if (detail)
+    {
+        // BUGBUG, Already loaded
+        return;
+    }
+
+
+
     font.load(path, size);
     loaded = true;
-}
-
-void font::unload()
-{
-    auto &font = detail::font::get(handle);
-    font.unload();
 }
 
 void font::stringSize(const std::string &string, float *width, float *height)
 {
     if (!isLoaded())
         load();
-    auto &font = detail::font::get(handle);
-    font.stringSize(string, width, height);
+    if (!pointer)
+        return;
+    pointer->stringSize(string, width, height);
 }
+
+font::font(std::string path, float size): size(size)
+{
+    pointer = std::make_unique<detail::font::font>();
+}
+
+font::font(std::string family, float size, bool bold, bool italic): size(size)
+{
+    pointer = std::make_unique<detail::font::font>();
+
+}
+
 }

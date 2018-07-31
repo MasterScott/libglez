@@ -8,25 +8,25 @@
 #include <freetype-gl.hpp>
 #include <limits>
 #include <string>
+#include <memory>
 
 namespace glez::detail::font
 {
 
-struct font
+class font
 {
-    void load(const std::string &path, float size);
-    void unload();
+public:
+    ~font();
+
+    bool load(const std::string &path, float size);
+    bool loadFamily(std::string family, float size, bool bold, bool italic);
+
     void stringSize(const std::string &string, float *width, float *height);
 
-    bool init{ false };
-
-    ftgl::texture_font_t *font{ nullptr };
-    ftgl::texture_atlas_t *atlas{ nullptr };
+    bool error{ false };
+    std::unique_ptr<ftgl::TextureFont> texture{};
+protected:
+    bool internalLoad(ftgl::TextureFont *font);
 };
 
-void init();
-void shutdown();
-
-unsigned create();
-font &get(unsigned handle);
 }

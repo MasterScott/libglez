@@ -7,6 +7,8 @@
 
 #include <string>
 #include <limits>
+#include <glez/detail_forward.hpp>
+#include <memory>
 
 namespace glez
 {
@@ -14,32 +16,21 @@ namespace glez
 class font
 {
 public:
-    inline font(std::string path, float size)
-        : path(std::move(path)), size(size), loaded(false)
-    {
-    }
-    ~font();
-
-    inline unsigned getHandle() const
-    {
-        return handle;
-    }
+    font(std::string path, float size);
+    font(std::string family, float size, bool bold, bool italic);
 
     inline bool isLoaded() const
     {
-        return loaded;
+        return !error && pointer;
     }
 
-    void load();
-    void unload();
     void stringSize(const std::string &string, float *width, float *height);
 
-    const std::string path;
     const float size;
-
 protected:
-    bool loaded{ false };
+    void load();
 
-    unsigned handle{ std::numeric_limits<unsigned>::max() };
+    bool error{ false };
+    std::unique_ptr<detail::font::font> pointer{ nullptr };
 };
 }

@@ -47,6 +47,7 @@ namespace ftgl
  */
 class FontManager
 {
+public:
     /**
      * Creates a new empty font manager.
      *
