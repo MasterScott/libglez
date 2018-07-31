@@ -13,53 +13,34 @@
 namespace ftgl
 {
 
-// ----------------------------------------------------------------------------
-vertex_attribute_t *vertex_attribute_new(GLchar *name, GLint size, GLenum type,
-                                         GLboolean normalized, GLsizei stride,
-                                         GLvoid *pointer)
+VertexAttribute::VertexAttribute(GLchar *name, GLint size, GLenum type,
+                                 GLboolean normalized, GLsizei stride,
+                                 GLvoid *pointer)
+     : size(size), type(type), normalized(normalized), stride(stride)
 {
-    vertex_attribute_t *attribute =
-            (vertex_attribute_t *) malloc(sizeof(vertex_attribute_t));
-
     assert(size > 0);
 
-    attribute->name = (GLchar *) strdup(name);
-    attribute->index = -1;
-    attribute->size = size;
-    attribute->type = type;
-    attribute->normalized = normalized;
-    attribute->stride = stride;
-    attribute->pointer = pointer;
-    return attribute;
+    name = (GLchar *) strdup(name);
+    index = 0xFFFFFFFF;
+    pointer = pointer;
 }
 
-// ----------------------------------------------------------------------------
-void vertex_attribute_delete(vertex_attribute_t *self)
-{
-    assert(self);
-
-    free(self->name);
-    free(self);
-}
-
-// ----------------------------------------------------------------------------
-vertex_attribute_t *vertex_attribute_parse(char *format)
+std::optional<VertexAttribute> VertexAttribute::parse(char *format)
 {
     GLenum type = 0;
     int size;
-    int normalized = 0;
+    GLboolean normalized = GL_FALSE;
     char ctype;
     char *name;
-    vertex_attribute_t *attr;
     char *p = strchr(format, ':');
-    if (p != NULL)
+    if (p != nullptr)
     {
         name = strndup(format, p - format);
         if (*(++p) == '\0')
         {
             fprintf(stderr, "No size specified for '%s' attribute\n", name);
             free(name);
-            return 0;
+            return std::nullopt;
         }
         size = *p - '0';
 
@@ -67,7 +48,7 @@ vertex_attribute_t *vertex_attribute_parse(char *format)
         {
             fprintf(stderr, "No format specified for '%s' attribute\n", name);
             free(name);
-            return 0;
+            return std::nullopt;
         }
         ctype = *p;
 
@@ -75,14 +56,14 @@ vertex_attribute_t *vertex_attribute_parse(char *format)
         {
             if (*p == 'n')
             {
-                normalized = 1;
+                normalized = GL_TRUE;
             }
         }
     } else
     {
         fprintf(stderr, "Vertex attribute format not understood ('%s')\n",
                 format);
-        return 0;
+        return std::nullopt;
     }
 
     switch (ctype)
@@ -113,15 +94,12 @@ vertex_attribute_t *vertex_attribute_parse(char *format)
         break;
     }
 
-    attr = vertex_attribute_new(name, size, type, normalized, 0, 0);
-    free(name);
-    return attr;
+    return VertexAttribute(name, size, type, normalized, 0, nullptr);
 }
 
-// ----------------------------------------------------------------------------
-void vertex_attribute_enable(vertex_attribute_t *attr)
+void VertexAttribute::enable()
 {
-    if (attr->index == -1)
+    if (index == 0xFFFFFFFF)
     {
         GLint program;
         glGetIntegerv(GL_CURRENT_PROGRAM, &program);
@@ -129,14 +107,16 @@ void vertex_attribute_enable(vertex_attribute_t *attr)
         {
             return;
         }
-        attr->index = glGetAttribLocation(program, attr->name);
-        if (attr->index == -1)
+        auto idx = glGetAttribLocation((GLuint)program, name);
+        if (idx == -1)
         {
             return;
         }
+        index = (GLuint) idx;
     }
-    glEnableVertexAttribArray(attr->index);
-    switch (attr->type)
+
+    glEnableVertexAttribArray(index);
+    switch (type)
     {
     case GL_UNSIGNED_SHORT:
     case GL_UNSIGNED_INT:
@@ -144,12 +124,10 @@ void vertex_attribute_enable(vertex_attribute_t *attr)
     case GL_SHORT:
     case GL_INT:
     case GL_BYTE:
-        glVertexAttribIPointer(attr->index, attr->size, attr->type,
-                               attr->stride, attr->pointer);
+        glVertexAttribIPointer(index, size, type, stride, pointer);
         break;
     default:
-        glVertexAttribPointer(attr->index, attr->size, attr->type,
-                              attr->normalized, attr->stride, attr->pointer);
+        glVertexAttribPointer(index, size, type, normalized, stride, pointer);
     }
 }
 

@@ -6,10 +6,14 @@
 
 #pragma once
 
-#include "vector.hpp"
 #include "markup.hpp"
 #include "texture-font.hpp"
 #include "texture-atlas.hpp"
+
+#include <vector>
+#include <string>
+#include <optional>
+#include <memory>
 
 namespace ftgl
 {
@@ -41,110 +45,98 @@ namespace ftgl
 /**
  * Structure in charge of caching fonts.
  */
-typedef struct font_manager_t
+class FontManager
 {
+    /**
+     * Creates a new empty font manager.
+     *
+     * @param   width   width of the underlying atlas
+     * @param   height  height of the underlying atlas
+     * @param   depth   bit depth of the underlying atlas
+     *
+     */
+    FontManager(size_t width, size_t height, size_t depth);
+
+    /**
+     *  Deletes a font from the font manager.
+     *
+     *  Note that font glyphs are not removed from the atlas.
+     *
+     *  @param font font to be deleted
+     *
+     */
+    void delete_font(TextureFont& font);
+
+    /**
+     *  Request for a font based on a filename.
+     *
+     *  @param filename font filename
+     *  @param size     font size
+     *
+     *  @return Requested font
+     */
+    TextureFont *get_from_filename(std::string filename, float size);
+
+    /**
+     *  Request for a font based on a description
+     *
+     *  @param self     a font manager
+     *  @param family   font family
+     *  @param size     font size
+     *  @param bold     whether font is bold
+     *  @param italic   whether font is italic
+     *
+     *  @return Requested font
+     */
+    TextureFont *get_from_description(std::string family, float size, bool bold, bool italic);
+
+    /**
+     *  Request for a font based on a markup
+     *
+     *  @param self    a font manager
+     *  @param markup  Markup describing a font
+     *
+     *  @return Requested font
+     */
+    TextureFont *get_from_markup(const Markup& markup);
+
+    /**
+     *  Search for a font filename that match description.
+     *
+     *  @param self    a font manager
+     *  @param family   font family
+     *  @param size     font size
+     *  @param bold     whether font is bold
+     *  @param italic   whether font is italic
+     *
+     *  @return Requested font filename
+     */
+    std::optional<std::string> match_description(std::string family, float size, bool bold, bool italic);
+
     /**
      * Texture atlas to hold font glyphs.
      */
-    texture_atlas_t *atlas;
+    TextureAtlas atlas;
 
     /**
      * Cached textures.
      */
-    vector_t *fonts;
+    std::vector<std::unique_ptr<TextureFont>> fonts{};
 
     /**
      * Default glyphs to be loaded when loading a new font.
      */
-    char *cache;
+    std::vector<char> cache{};
 
-} font_manager_t;
+};
 
-/**
- * Creates a new empty font manager.
- *
- * @param   width   width of the underlying atlas
- * @param   height  height of the underlying atlas
- * @param   depth   bit depth of the underlying atlas
- *
- * @return          a new font manager.
- *
- */
-font_manager_t *font_manager_new(size_t width, size_t height, size_t depth);
 
-/**
- *  Deletes a font manager.
- *
- *  @param self a font manager.
- */
-void font_manager_delete(font_manager_t *self);
 
-/**
- *  Deletes a font from the font manager.
- *
- *  Note that font glyphs are not removed from the atlas.
- *
- *  @param self a font manager.
- *  @param font font to be deleted
- *
- */
-void font_manager_delete_font(font_manager_t *self, texture_font_t *font);
 
-/**
- *  Request for a font based on a filename.
- *
- *  @param self     a font manager.
- *  @param filename font filename
- *  @param size     font size
- *
- *  @return Requested font
- */
-texture_font_t *font_manager_get_from_filename(font_manager_t *self,
-                                               const char *filename,
-                                               const float size);
 
-/**
- *  Request for a font based on a description
- *
- *  @param self     a font manager
- *  @param family   font family
- *  @param size     font size
- *  @param bold     whether font is bold
- *  @param italic   whether font is italic
- *
- *  @return Requested font
- */
-texture_font_t *font_manager_get_from_description(font_manager_t *self,
-                                                  const char *family,
-                                                  const float size,
-                                                  const int bold,
-                                                  const int italic);
 
-/**
- *  Request for a font based on a markup
- *
- *  @param self    a font manager
- *  @param markup  Markup describing a font
- *
- *  @return Requested font
- */
-texture_font_t *font_manager_get_from_markup(font_manager_t *self,
-                                             const markup_t *markup);
 
-/**
- *  Search for a font filename that match description.
- *
- *  @param self    a font manager
- *  @param family   font family
- *  @param size     font size
- *  @param bold     whether font is bold
- *  @param italic   whether font is italic
- *
- *  @return Requested font filename
- */
-char *font_manager_match_description(font_manager_t *self, const char *family,
-                                     const float size, const int bold,
-                                     const int italic);
+
 
 /** @} */
 

@@ -54,12 +54,12 @@ namespace ftgl
 /**
  * Simple structure that describes text properties.
  */
-typedef struct markup_t
+struct Markup
 {
     /**
      * A font family name such as "normal", "sans", "serif" or "monospace".
      */
-    char *family;
+    std::string family{};
 
     /**
      * Font size.
@@ -69,84 +69,79 @@ typedef struct markup_t
     /**
      * Whether text is bold.
      */
-    int bold;
+    bool bold{ false };
 
     /**
      * Whether text is italic.
      */
-    int italic;
+    bool italic{ false };
 
     /**
      * Spacing between letters.
      */
-    float spacing;
+    float spacing{ 1.0f };
 
     /**
      * Gamma correction.
      */
-    float gamma;
+    float gamma{ 1.0f };
 
     /**
      * Text color.
      */
-    vec4 foreground_color;
+    vec4 foreground_color{};
 
     /**
      * Background color.
      */
-    vec4 background_color;
+    vec4 background_color{};
 
     /**
      * Whether outline is active.
      */
-    int outline;
+    bool outline{ false };
 
     /**
      * Outline color.
      */
-    vec4 outline_color;
+    vec4 outline_color{};
 
     /**
      * Whether underline is active.
      */
-    int underline;
+    bool underline{ false };
 
     /**
      * Underline color.
      */
-    vec4 underline_color;
+    vec4 underline_color{};
 
     /**
      * Whether overline is active.
      */
-    int overline;
+    bool overline{ false };
 
     /**
      * Overline color.
      */
-    vec4 overline_color;
+    vec4 overline_color{};
 
     /**
      * Whether strikethrough is active.
      */
-    int strikethrough;
+    bool strikethrough{ false };
 
     /**
      * Strikethrough color.
      */
-    vec4 strikethrough_color;
+    vec4 strikethrough_color{};
 
     /**
      * Pointer on the corresponding font (family/size/bold/italic)
      */
-    texture_font_t *font;
+    TextureFont *font{ nullptr };
 
-} markup_t;
-
-/**
- * Default markup
- */
-extern markup_t default_markup;
+};
 
 /** @} */
 

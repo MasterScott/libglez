@@ -3,11 +3,8 @@
  * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
  * file `LICENSE` for more details.
  */
-#if 0
-#if !defined(_WIN32) && !defined(_WIN64)
+
 #include <fontconfig/fontconfig.h>
-#endif
-#endif
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +17,7 @@ namespace ftgl
 // ------------------------------------------------------------ file_exists ---
 static int file_exists(const char *filename)
 {
-    FILE *file = fopen(filename, "r");
+    auto file = fopen(filename, "r");
     if (file)
     {
         fclose(file);
@@ -29,163 +26,78 @@ static int file_exists(const char *filename)
     return 0;
 }
 
-// ------------------------------------------------------- font_manager_new ---
-font_manager_t *font_manager_new(size_t width, size_t height, size_t depth)
+FontManager::FontManager(size_t width, size_t height, size_t depth): atlas(width, height, depth)
 {
-    font_manager_t *self;
-    texture_atlas_t *atlas = texture_atlas_new(width, height, depth);
-    self = (font_manager_t *) malloc(sizeof(font_manager_t));
-    if (!self)
-    {
-        fprintf(stderr, "line %d: No more memory for allocating data\n",
-                __LINE__);
-        exit(EXIT_FAILURE);
-    }
-    self->atlas = atlas;
-    self->fonts = vector_new(sizeof(texture_font_t *));
-    self->cache = strdup(" ");
-    return self;
+    cache.push_back(' ');
+    cache.push_back('\0');
 }
 
-// ---------------------------------------------------- font_manager_delete ---
-void font_manager_delete(font_manager_t *self)
+void FontManager::delete_font(TextureFont &font)
 {
-    size_t i;
-    texture_font_t *font;
-    assert(self);
-
-    for (i = 0; i < vector_size(self->fonts); ++i)
+    for (auto it = fonts.begin(); it != fonts.end();)
     {
-        font = *(texture_font_t **) vector_get(self->fonts, i);
-        texture_font_delete(font);
+        if ((*it)->filename == font.filename && font.size == (*it)->size)
+            it = fonts.erase(it);
+        else
+            ++it;
     }
-    vector_delete(self->fonts);
-    texture_atlas_delete(self->atlas);
-    if (self->cache)
-    {
-        free(self->cache);
-    }
-    free(self);
 }
 
-// ----------------------------------------------- font_manager_delete_font ---
-void font_manager_delete_font(font_manager_t *self, texture_font_t *font)
+TextureFont *FontManager::get_from_filename(std::string filename, float size)
 {
-    size_t i;
-    texture_font_t *other;
-
-    assert(self);
-    assert(font);
-
-    for (i = 0; i < self->fonts->size; ++i)
+    for (auto& font: fonts)
     {
-        other = (texture_font_t *) vector_get(self->fonts, i);
-        if ((strcmp(font->filename, other->filename) == 0) &&
-            (font->size == other->size))
+        if ((font->filename == filename) && (font->size == size))
         {
-            vector_erase(self->fonts, i);
-            break;
+            return font.get();
         }
     }
-    texture_font_delete(font);
+    auto font = std::make_unique<TextureFont>(atlas, size, filename);
+    if (font->init())
+    {
+        auto result = font.get();
+        font->load_glyphs(cache.data());
+        fonts.push_back(std::move(font));
+        return result;
+    }
+    fprintf(stderr, "Unable to load \"%s\" (size=%.1f)\n", filename.c_str(), size);
+    return nullptr;
 }
 
-// ----------------------------------------- font_manager_get_from_filename ---
-texture_font_t *font_manager_get_from_filename(font_manager_t *self,
-                                               const char *filename,
-                                               const float size)
+TextureFont *
+FontManager::get_from_description(std::string family, float size, bool bold,
+                                  bool italic)
 {
-    size_t i;
-    texture_font_t *font;
+    std::string filename{};
 
-    assert(self);
-    for (i = 0; i < vector_size(self->fonts); ++i)
+    if (file_exists(family.c_str()))
     {
-        font = *(texture_font_t **) vector_get(self->fonts, i);
-        if ((strcmp(font->filename, filename) == 0) && (font->size == size))
-        {
-            return font;
-        }
+        filename = family;
     }
-    font = texture_font_new_from_file(self->atlas, size, filename);
-    if (font)
+    else
     {
-        vector_push_back(self->fonts, &font);
-        texture_font_load_glyphs(font, self->cache);
-        return font;
-    }
-    fprintf(stderr, "Unable to load \"%s\" (size=%.1f)\n", filename, size);
-    return 0;
-}
-
-// ----------------------------------------- font_manager_get_from_description
-// ---
-texture_font_t *font_manager_get_from_description(font_manager_t *self,
-                                                  const char *family,
-                                                  const float size,
-                                                  const int bold,
-                                                  const int italic)
-{
-    texture_font_t *font;
-    char *filename = 0;
-
-    assert(self);
-
-    if (file_exists(family))
-    {
-        filename = strdup(family);
-    } else
-    {
-#if defined(_WIN32) || defined(_WIN64)
-        fprintf(stderr,
-                "\"font_manager_get_from_description\" not implemented yet.\n");
-        return 0;
-#endif
-        filename =
-                font_manager_match_description(self, family, size, bold,
-                                               italic);
-        if (!filename)
+        auto found = match_description(family, size, bold, italic);
+        if (!found)
         {
             fprintf(
                     stderr,
                     "No \"%s (size=%.1f, bold=%d, italic=%d)\" font available.\n",
-                    family, size, bold, italic);
-            return 0;
+                    family.c_str(), size, bold, italic);
+            return nullptr;
         }
     }
-    font = font_manager_get_from_filename(self, filename, size);
 
-    free(filename);
-    return font;
+    return get_from_filename(filename, size);
 }
 
-// ------------------------------------------- font_manager_get_from_markup ---
-texture_font_t *font_manager_get_from_markup(font_manager_t *self,
-                                             const markup_t *markup)
+TextureFont *FontManager::get_from_markup(const Markup &markup)
 {
-    assert(self);
-    assert(markup);
-
-    return font_manager_get_from_description(self, markup->family, markup->size,
-                                             markup->bold, markup->italic);
+    return get_from_description(markup.family, markup.size, markup.bold, markup.italic);
 }
 
-// ----------------------------------------- font_manager_match_description ---
-char *font_manager_match_description(font_manager_t *self, const char *family,
-                                     const float size, const int bold,
-                                     const int italic)
+std::optional<std::string>
+FontManager::match_description(std::string family, float size, bool bold, bool italic)
 {
-// Use of fontconfig is disabled by default.
-#if 1
-    return 0;
-#else
-#if defined _WIN32 || defined _WIN64
-    fprintf(
-        stderr,
-        "\"font_manager_match_description\" not implemented for windows.\n");
-    return 0;
-#endif
-    char *filename = 0;
     int weight     = FC_WEIGHT_REGULAR;
     int slant      = FC_SLANT_ROMAN;
     if (bold)
@@ -196,41 +108,42 @@ char *font_manager_match_description(font_manager_t *self, const char *family,
     {
         slant = FC_SLANT_ITALIC;
     }
+
     FcInit();
-    FcPattern *pattern = FcPatternCreate();
+    auto pattern = FcPatternCreate();
     FcPatternAddDouble(pattern, FC_SIZE, size);
     FcPatternAddInteger(pattern, FC_WEIGHT, weight);
     FcPatternAddInteger(pattern, FC_SLANT, slant);
-    FcPatternAddString(pattern, FC_FAMILY, (FcChar8 *) family);
-    FcConfigSubstitute(0, pattern, FcMatchPattern);
+    FcPatternAddString(pattern, FC_FAMILY, (FcChar8 *) family.c_str());
+    FcConfigSubstitute(nullptr, pattern, FcMatchPattern);
     FcDefaultSubstitute(pattern);
     FcResult result;
-    FcPattern *match = FcFontMatch(0, pattern, &result);
+    auto match = FcFontMatch(nullptr, pattern, &result);
     FcPatternDestroy(pattern);
 
     if (!match)
     {
         fprintf(stderr, "fontconfig error: could not match family '%s'",
-                family);
-        return 0;
+                family.c_str());
+        return std::nullopt;
     }
     else
     {
         FcValue value;
-        FcResult result = FcPatternGet(match, FC_FILE, 0, &value);
-        if (result)
+        auto font = FcPatternGet(match, FC_FILE, 0, &value);
+        if (font)
         {
             fprintf(stderr, "fontconfig error: could not match family '%s'",
-                    family);
+                    family.c_str());
+            FcPatternDestroy(match);
+            return std::nullopt;
         }
         else
         {
-            filename = strdup((char *) (value.u.s));
+            std::optional<std::string> path = std::string((const char *)value.u.s);
+            FcPatternDestroy(match);
+            return path;
         }
     }
-    FcPatternDestroy(match);
-    return filename;
-#endif
 }
-
 }

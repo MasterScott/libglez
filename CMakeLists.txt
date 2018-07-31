@@ -23,7 +23,7 @@ add_library(${PROJECT_NAME} STATIC "")
 target_compile_definitions(glez PRIVATE
         _GLIBCXX_USE_CXX11_ABI=0)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" CXX_STANDARD 17)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -43,8 +43,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE ${PNG_DEFINITIONS})
 
 target_link_libraries(${PROJECT_NAME} ${PNG_LIBRARIES} ${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/freetype/lib/libfreetype.a z GL)
 
-add_subdirectory(src)
-add_subdirectory(include/glez)
+#add_subdirectory(src)
+#add_subdirectory(include/glez)
 add_subdirectory(ftgl)
 
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION "${lib_dest}")

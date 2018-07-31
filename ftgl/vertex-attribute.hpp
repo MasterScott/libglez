@@ -8,6 +8,8 @@
 
 #include "opengl.hpp"
 
+#include <optional>
+
 namespace ftgl
 {
 
@@ -164,8 +166,44 @@ namespace ftgl
 /**
  *  Generic vertex attribute.
  */
-typedef struct vertex_attribute_t
+class VertexAttribute
 {
+public:
+    /**
+     * Create an attribute from the given parameters.
+     *
+     * @param size       number of component
+     * @param type       data type
+     * @param normalized Whether fixed-point data values should be normalized
+                         (GL_TRUE) or converted directly as fixed-point values
+                         (GL_FALSE) when they are  accessed.
+     * @param stride     byte offset between consecutive attributes.
+     * @param pointer    pointer to the first component of the first attribute
+     *                   element in the array.
+     *
+     * @private
+     */
+    VertexAttribute(GLchar *name, GLint size, GLenum type,
+                                             GLboolean normalized, GLsizei stride,
+                                             GLvoid *pointer);
+
+    /**
+     * Create an attribute from the given description.
+     *
+     * @param  format Format string specifies the format of a vertex attribute.
+     * @return        an initialized vertex attribute
+     *
+     * @private
+     */
+    static std::optional<VertexAttribute> parse(char *format);
+
+    /**
+     * Enable a vertex attribute.
+     *
+     * @private
+     */
+    void enable();
+
     /**
      *  atribute name
      */
@@ -181,7 +219,7 @@ typedef struct vertex_attribute_t
      *
      * Must be 1, 2, 3, or 4. The initial value is 4.
      */
-    GLint size;
+    const GLint size;
 
     /**
      *  data type of each component in the array.
@@ -190,14 +228,14 @@ typedef struct vertex_attribute_t
      *  GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, or GL_DOUBLE are
      *  accepted. The initial value is GL_FLOAT.
      */
-    GLenum type;
+    const GLenum type;
 
     /**
      *  whether fixed-point data values should be normalized (GL_TRUE) or
      *  converted directly as fixed-point values (GL_FALSE) when they are
      *  accessed.
      */
-    GLboolean normalized;
+    const GLboolean normalized;
 
     /**
      *  byte offset between consecutive generic vertex attributes.
@@ -216,55 +254,9 @@ typedef struct vertex_attribute_t
     /**
      * pointer to the function that enable this attribute.
      */
-    void (*enable)(void *);
+    void (*enable_func)(void *);
 
-} vertex_attribute_t;
-
-/**
- * Create an attribute from the given parameters.
- *
- * @param size       number of component
- * @param type       data type
- * @param normalized Whether fixed-point data values should be normalized
-                     (GL_TRUE) or converted directly as fixed-point values
-                     (GL_FALSE) when they are  accessed.
- * @param stride     byte offset between consecutive attributes.
- * @param pointer    pointer to the first component of the first attribute
- *                   element in the array.
- * @return           a new initialized vertex attribute.
- *
- * @private
- */
-vertex_attribute_t *vertex_attribute_new(GLchar *name, GLint size, GLenum type,
-                                         GLboolean normalized, GLsizei stride,
-                                         GLvoid *pointer);
-
-/**
- * Delete a vertex attribute.
- *
- * @param  self a vertex attribute
- *
- */
-void vertex_attribute_delete(vertex_attribute_t *self);
-
-/**
- * Create an attribute from the given description.
- *
- * @param  format Format string specifies the format of a vertex attribute.
- * @return        an initialized vertex attribute
- *
- * @private
- */
-vertex_attribute_t *vertex_attribute_parse(char *format);
-
-/**
- * Enable a vertex attribute.
- *
- * @param attr  a vertex attribute
- *
- * @private
- */
-void vertex_attribute_enable(vertex_attribute_t *attr);
+};
 
 /** @} */
 
