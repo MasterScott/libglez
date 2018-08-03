@@ -37,6 +37,7 @@ void glez::render::bindVertexBuffer(ftgl::IVertexBuffer *buffer)
     {
         commit();
         render_state.buffer = buffer;
+        render_state.buffer->clear();
     }
 }
 

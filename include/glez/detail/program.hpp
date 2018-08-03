@@ -29,6 +29,8 @@ void reset();
 void begin();
 void end();
 
+GLuint shaderIdentity();
+
 unsigned next_index();
 
 extern ftgl::VertexBuffer<glez::detail::render::vertex> buffer;

@@ -10,6 +10,10 @@
 #include <cstring>
 #include <glez/detail/texture.hpp>
 #include <cmath>
+#include <glez/draw.hpp>
+#include <glez/Render.hpp>
+
+static ftgl::VertexBuffer<glez::detail::render::vertex> vertex_buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
 
 namespace indices
 {
@@ -103,7 +107,7 @@ static GLuint rectangle[6] = { 0, 1, 2, 2, 3, 0 };
 namespace glez::draw
 {
 
-void line(float x, float y, float dx, float dy, rgba color, float thickness)
+/*void line(float x, float y, float dx, float dy, rgba color, float thickness)
 {
     // Dirty
     x += 0.5f;
@@ -147,10 +151,13 @@ void line(float x, float y, float dx, float dy, rgba color, float thickness)
     vertices[0].position = { ex + nx - px, ey + ny - py };
 
     detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
-}
+}*/
 
 void rect(float x, float y, float w, float h, rgba color)
 {
+    render::useProgram(detail::program::shaderIdentity());
+    render::bindVertexBuffer(&vertex_buffer);
+
     detail::render::vertex vertices[4];
 
     for (auto &vertex : vertices)
@@ -164,7 +171,39 @@ void rect(float x, float y, float w, float h, rgba color)
     vertices[2].position = { x + w, y + h };
     vertices[3].position = { x + w, y };
 
-    detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
+#if GLEZ_IMMEDIATE_MODE
+    vertex_buffer.push_back(vertices, 4, indices::rectangle, 6);
+#else
+#error Not implemented
+#endif
+}
+
+void
+rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne,
+           rgba color_se, rgba color_sw)
+{
+    render::useProgram(detail::program::shaderIdentity());
+    render::bindVertexBuffer(&vertex_buffer);
+
+    detail::render::vertex vertices[4];
+
+    for (auto& vertex: vertices)
+        vertex.mode = static_cast<int>(detail::program::mode::PLAIN);
+
+    vertices[0].position = { x, y };
+    vertices[0].color = color_nw;
+    vertices[1].position = { x, y + h };
+    vertices[1].color = color_sw;
+    vertices[2].position = { x + w, y + h };
+    vertices[2].color = color_se;
+    vertices[3].position = { x + w, y };
+    vertices[3].color = color_ne;
+
+#if GLEZ_IMMEDIATE_MODE
+    vertex_buffer.push_back(vertices, 4, indices::rectangle, 6);
+#else
+#error Not implemented
+#endif
 }
 
 void rect_outline(float x, float y, float w, float h, rgba color, float thickness)

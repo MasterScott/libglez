@@ -14,13 +14,11 @@ namespace glez
 void init(int width, int height)
 {
     detail::program::init(width, height);
-    detail::texture::init();
 }
 
 void shutdown()
 {
     detail::program::shutdown();
-    detail::texture::shutdown();
 }
 
 void resize(int width, int height)

@@ -63,6 +63,11 @@ public:
      * @param  count amount of items to be rendered
      */
     virtual void render_items(size_t start, size_t count) = 0;
+
+    /**
+     * Clear all items.
+     */
+    virtual void clear() = 0;
 };
 
 /**
@@ -118,15 +123,12 @@ public:
 
     void render_items(size_t start, size_t count) final;
 
+    void clear() final;
+
     /**
      * Upload buffer to GPU memory.
      */
     void upload();
-
-    /**
-     * Clear all items.
-     */
-    void clear();
 
     /**
      * Appends indices at the end of the buffer.

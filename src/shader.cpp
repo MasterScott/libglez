@@ -8,7 +8,7 @@
 #include <glez/shader.hpp>
 #include <cassert>
 
-GLuint compile(const char *source, GLenum type)
+GLuint glez::shader::compile(const char *source, GLenum type)
 {
     GLint status;
     GLuint result = glCreateShader(type);
@@ -29,7 +29,7 @@ GLuint compile(const char *source, GLenum type)
     return result;
 }
 
-GLuint link(GLuint vertex, GLuint fragment)
+GLuint glez::shader::link(GLuint vertex, GLuint fragment)
 {
     GLuint result = glCreateProgram();
     GLint status;

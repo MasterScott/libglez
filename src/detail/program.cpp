@@ -116,4 +116,9 @@ void end()
     glUseProgram(0);
 }
 
+GLuint shaderIdentity()
+{
+    return shader_identity;
+}
+
 }

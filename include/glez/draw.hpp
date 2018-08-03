@@ -12,7 +12,37 @@
 namespace glez::draw
 {
 
-void line(float x, float y, float dx, float dy, rgba color, float thickness);
+/*
+ * Rectangles
+ * Lines
+ * Circles
+ * Text
+ */
+
+/**
+ * Render a solid-colored filled rectangle
+ * @param x X position on screen
+ * @param y Y position on screen
+ * @param w Width
+ * @param h Height
+ * @param color The color
+ */
+void rect(float x, float y, float w, float h, rgba color);
+
+/**
+ * Render a rectangle with color transition
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @param color_nw Top left color
+ * @param color_ne Top right color
+ * @param color_se Bottom right color
+ * @param color_sw Bottom left color
+ */
+void rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne, rgba color_se, rgba color_sw);
+
+/*void line(float x, float y, float dx, float dy, rgba color, float thickness);
 void rect(float x, float y, float w, float h, rgba color);
 void rect_outline(float x, float y, float w, float h, rgba color, float thickness);
 void circle(float x, float y, float radius, rgba color, float thickness, int steps);
@@ -24,7 +54,7 @@ void rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne, rgba
 
 void rect_outline(float x, float y, float w, float h, rgba color_nw, rgba color_ne, rgba color_se, rgba color_sw);
 
-void circle(float x, float y, float radius_inner, float radius_outer, rgba color);
+void circle(float x, float y, float radius_inner, float radius_outer, rgba color);*/
 
 
 /*void rect_textured(float x, float y, float w, float h, rgba color, texture &texture,
