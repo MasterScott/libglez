@@ -4,12 +4,13 @@
 */
 
 #include <freetype-gl.hpp>
-#include <vertex-buffer.hpp>
-#include <mat4.hpp>
+#include "../vertex-buffer.hpp"
+#include "../mat4.hpp"
 #include <glez/detail/program.hpp>
 #include <cstdio>
 #include <stdexcept>
 #include <cassert>
+#include <glez/shader.hpp>
 
 static const char *shader_vertex = R"END(
 #version 130
@@ -55,102 +56,59 @@ void main()
 }
 )END";
 
-static GLuint shader{ 0 };
-
-GLuint compile(const char *source, GLenum type)
-{
-    GLint status;
-    GLuint result = glCreateShader(type);
-
-    glShaderSource(result, 1, &source, 0);
-    glCompileShader(result);
-    glGetShaderiv(result, GL_COMPILE_STATUS, &status);
-
-    if (status != GL_TRUE)
-    {
-        char error[512];
-        GLsizei length;
-        glGetShaderInfoLog(result, 512, &length, error);
-        fprintf(stderr, "GLEZ: Shader compile error: %s, %s\n", error, source);
-        throw std::runtime_error("Shader compile error: " + std::string(error));
-    }
-
-    return result;
-}
-
-GLuint link(GLuint vertex, GLuint fragment)
-{
-    GLuint result = glCreateProgram();
-    GLint status;
-
-    glAttachShader(result, vertex);
-    glAttachShader(result, fragment);
-
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
-
-    glLinkProgram(result);
-    glGetProgramiv(result, GL_LINK_STATUS, &status);
-
-    assert(status == GL_TRUE);
-
-    return result;
-}
+static GLuint shader_identity{};
 
 namespace glez::detail::program
 {
 
-ftgl::vertex_buffer_t *buffer{ nullptr };
+ftgl::VertexBuffer<glez::detail::render::vertex> buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
 
 void resize(int width, int height)
 {
-    glUseProgram(shader);
+    glUseProgram(shader_identity);
     ftgl::mat4 projection{};
     projection.set_identity();
     projection.set_orthographic(0, width, height, 0, -1, 1);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, 0,
+    glUniformMatrix4fv(glGetUniformLocation(shader_identity, "projection"), 1, 0,
                        projection.data);
     glUseProgram(0);
 }
 
 void init(int width, int height)
 {
-    buffer =
-        ftgl::vertex_buffer_new("vertex:2f,tex_coord:2f,color:4f,drawmode:1i");
-    shader = link(compile(shader_vertex, GL_VERTEX_SHADER),
-                  compile(shader_fragment, GL_FRAGMENT_SHADER));
+    shader_identity = shader::link(shader::compile(shader_vertex, GL_VERTEX_SHADER),
+                  shader::compile(shader_fragment, GL_FRAGMENT_SHADER));
 
     resize(width, height);
-    glUseProgram(shader);
 
-    glUniform1i(glGetUniformLocation(shader, "texture"), 0);
+    glUseProgram(shader_identity);
+    glUniform1i(glGetUniformLocation(shader_identity, "texture"), 0);
     glUseProgram(0);
 }
 
 void shutdown()
 {
-    ftgl::vertex_buffer_delete(buffer);
-    glDeleteProgram(shader);
+    glDeleteProgram(shader_identity);
 }
 
 void draw()
 {
-    vertex_buffer_render(buffer, GL_TRIANGLES);
+    buffer.render(GL_TRIANGLES);
 }
 
 void reset()
 {
-    ftgl::vertex_buffer_clear(buffer);
+    buffer.clear();
 }
 
 unsigned next_index()
 {
-    return buffer->vertices->size;
+    return buffer.vertices.size();
 }
 
 void begin()
 {
-    glUseProgram(shader);
+    glUseProgram(shader_identity);
 }
 
 void end()

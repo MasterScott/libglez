@@ -22,7 +22,8 @@ find_package(PNG REQUIRED)
 add_library(${PROJECT_NAME} STATIC "")
 
 target_compile_definitions(glez PRIVATE
-        _GLIBCXX_USE_CXX11_ABI=0)
+        _GLIBCXX_USE_CXX11_ABI=0
+        FREETYPE_GL_USE_VAO=1)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" CXX_STANDARD 17)
 
@@ -47,6 +48,7 @@ target_link_libraries(${PROJECT_NAME} ${GLEW_LIBRARIES} ${PROJECT_SOURCE_DIR}/fr
 add_subdirectory(src)
 add_subdirectory(include/glez)
 add_subdirectory(ftgl)
+add_subdirectory(gl)
 
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION "${lib_dest}")
 install(DIRECTORY include/ DESTINATION "${include_dest}")

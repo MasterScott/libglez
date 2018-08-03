@@ -31,6 +31,4 @@ struct texture
 void init();
 void shutdown();
 
-unsigned create();
-texture &get(unsigned handle);
 }

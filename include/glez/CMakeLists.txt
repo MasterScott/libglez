@@ -3,8 +3,10 @@ target_sources(glez PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/glez.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/font.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/texture.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/shader.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/draw.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/detail_forward.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/record.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/record.hpp"
+        )
 
 add_subdirectory(detail)

@@ -25,11 +25,52 @@ namespace ftgl
  * @{
  */
 
+class IVertexBuffer
+{
+public:
+    /**
+     * Prepare vertex buffer for render.
+     *
+     * @param  mode  render mode
+     */
+    virtual void render_setup(GLenum mode) = 0;
+
+    /**
+     * Finish rendering by setting back modified states
+     *
+     * @param  self  a vertex buffer
+     */
+    virtual void render_finish() = 0;
+
+    /**
+     * Render vertex buffer.
+     *
+     * @param  mode  render mode
+     */
+    virtual void render(GLenum mode) = 0;
+
+    /**
+     * Render a specified item from the vertex buffer.
+     *
+     * @param  index index of the item to be rendered
+     */
+    virtual void render_item(size_t index) = 0;
+
+    /**
+     * Render a specified item from the vertex buffer.
+     *
+     * @param  start first index of the item array
+     * @param  count amount of items to be rendered
+     */
+    virtual void render_items(size_t start, size_t count) = 0;
+
+};
+
 /**
  * Generic vertex buffer.
  */
- template<typename Vertex>
-class VertexBuffer
+template<typename Vertex>
+class VertexBuffer: public IVertexBuffer
 {
 public:
     using vertex_type = Vertex;
@@ -68,33 +109,15 @@ public:
      */
     void print();
 
-    /**
-     * Prepare vertex buffer for render.
-     *
-     * @param  mode  render mode
-     */
-    void render_setup(GLenum mode);
+    void render_setup(GLenum mode) final;
 
-    /**
-     * Finish rendering by setting back modified states
-     *
-     * @param  self  a vertex buffer
-     */
-    void render_finish();
+    void render_finish() final;
 
-    /**
-     * Render vertex buffer.
-     *
-     * @param  mode  render mode
-     */
-    void render(GLenum mode);
+    void render(GLenum mode) final;
 
-    /**
-     * Render a specified item from the vertex buffer.
-     *
-     * @param  index index of the item to be rendered
-     */
-    void render_item(size_t index);
+    void render_item(size_t index) final;
+
+    void render_items(size_t start, size_t count) final;
 
     /**
      * Upload buffer to GPU memory.

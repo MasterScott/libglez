@@ -7,12 +7,11 @@
 #include <glez/font.hpp>
 #include <glez/detail/render.hpp>
 #include <glez/detail/program.hpp>
-#include <vertex-buffer.hpp>
+#include "vertex-buffer.hpp"
 #include <glez/detail/font.hpp>
 #include <cstring>
 #include <glez/detail/texture.hpp>
 #include <cmath>
-#include <glez/detail/record.hpp>
 
 namespace indices
 {
@@ -21,55 +20,40 @@ static GLuint rectangle[6] = { 0, 1, 2, 2, 3, 0 };
 }
 
 void internal_draw_string(float x, float y, const std::string &string,
-                          ftgl::texture_font_t *fnt, glez::rgba color, float *width,
+                          ftgl::TextureFont& fnt, glez::rgba color, float *width,
                           float *height)
 {
     float pen_x  = x;
-    float pen_y  = y + fnt->height / 1.5f;
+    float pen_y  = y + fnt.height / 1.5f;
     float size_y = 0;
 
-    if (glez::detail::record::currentRecord)
+    if (fnt.atlas.id == 0)
     {
-        glez::detail::record::currentRecord->bindFont(fnt);
+        glGenTextures(1, &fnt.atlas.id);
     }
-    else
+
+    glez::detail::render::bind(fnt.atlas.id);
+
+    if (fnt.atlas.dirty)
     {
-        if (fnt->atlas->id == 0)
-        {
-            glGenTextures(1, &fnt->atlas->id);
-        }
-
-        glez::detail::render::bind(fnt->atlas->id);
-
-        if (fnt->atlas->dirty)
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, fnt->atlas->width,
-                         fnt->atlas->height, 0, GL_RED, GL_UNSIGNED_BYTE,
-                         fnt->atlas->data);
-            fnt->atlas->dirty = 0;
-        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, fnt.atlas.width,
+                     fnt.atlas.height, 0, GL_RED, GL_UNSIGNED_BYTE,
+                     fnt.atlas.data);
+        fnt.atlas.dirty = 0;
     }
 
     const char *sstring = string.c_str();
 
-    bool skipped{ false };
-
     for (size_t i = 0; i < string.size(); ++i)
     {
-        ftgl::texture_glyph_t *glyph = texture_font_find_glyph(fnt, &sstring[i]);
-        if (glyph == NULL)
-        {
-            texture_font_load_glyph(fnt, &sstring[i]);
-            if (!skipped)
-                --i;
-            skipped = true;
+        auto glyph = fnt.get_glyph(&sstring[i]);
+        if (glyph == nullptr)
             continue;
-        }
-        skipped = false;
+
         glez::detail::render::vertex vertices[4];
         for (auto &vertex : vertices)
         {
@@ -80,17 +64,17 @@ void internal_draw_string(float x, float y, const std::string &string,
 
         if (i > 0)
         {
-            x += texture_glyph_get_kerning(glyph, &sstring[i - 1]);
+            x += glyph->get_kerning(&sstring[i - 1]);
         }
 
-        float x0 = (int) (pen_x + glyph->offset_x);
-        float y0 = (int) (pen_y - glyph->offset_y);
-        float x1 = (int) (x0 + glyph->width);
-        float y1 = (int) (y0 + glyph->height);
-        float s0 = glyph->s0;
-        float t0 = glyph->t0;
-        float s1 = glyph->s1;
-        float t1 = glyph->t1;
+        const float x0 = (int) (pen_x + glyph->offset_x);
+        const float y0 = (int) (pen_y - glyph->offset_y);
+        const float x1 = (int) (x0 + glyph->width);
+        const float y1 = (int) (y0 + glyph->height);
+        const float s0 = glyph->s0;
+        const float t0 = glyph->t0;
+        const float s1 = glyph->s1;
+        const float t1 = glyph->t1;
 
         vertices[0].position = { x0, y0 };
         vertices[0].uv       = { s0, t0 };
@@ -105,15 +89,11 @@ void internal_draw_string(float x, float y, const std::string &string,
         vertices[3].uv       = { s1, t0 };
 
         pen_x += glyph->advance_x;
-        // pen_x = (int) pen_x + 1;
+
         if (glyph->height > size_y)
             size_y = glyph->height;
 
-        if (glez::detail::record::currentRecord)
-            glez::detail::record::currentRecord->store(vertices, 4, indices::rectangle, 6);
-        else
-            vertex_buffer_push_back(glez::detail::program::buffer, vertices, 4,
-                                indices::rectangle, 6);
+        glez::detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
     }
 
     if (width)
@@ -168,11 +148,7 @@ void line(float x, float y, float dx, float dy, rgba color, float thickness)
     vertices[3].position = { ex + nx + px, ey + ny + py };
     vertices[0].position = { ex + nx - px, ey + ny - py };
 
-    if (detail::record::currentRecord)
-        detail::record::currentRecord->store(vertices, 4, indices::rectangle, 6);
-    else
-        ftgl::vertex_buffer_push_back(detail::program::buffer, vertices, 4,
-                                  indices::rectangle, 6);
+    detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
 }
 
 void rect(float x, float y, float w, float h, rgba color)
@@ -190,11 +166,7 @@ void rect(float x, float y, float w, float h, rgba color)
     vertices[2].position = { x + w, y + h };
     vertices[3].position = { x + w, y };
 
-    if (detail::record::currentRecord)
-        detail::record::currentRecord->store(vertices, 4, indices::rectangle, 6);
-    else
-        ftgl::vertex_buffer_push_back(detail::program::buffer, vertices, 4,
-                                  indices::rectangle, 6);
+    detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
 }
 
 void rect_outline(float x, float y, float w, float h, rgba color, float thickness)
@@ -205,30 +177,14 @@ void rect_outline(float x, float y, float w, float h, rgba color, float thicknes
     rect(x, y + h - 1, w, 1, color);
 }
 
-void circle(float x, float y, float radius, rgba color, float thickness, int steps)
-{
-    float px = 0;
-    float py = 0;
-    for (int i = 0; i <= steps; i++)
-    {
-        float ang = 2 * float(M_PI) * (float(i) / steps);
-        if (!i)
-            ang = 2 * float(M_PI);
-        if (i)
-            line(px, py, x - px + radius * cos(ang), y - py + radius * sin(ang),
-                 color, thickness);
-        px = x + radius * cos(ang);
-        py = y + radius * sin(ang);
-    }
-}
-
 void string(float x, float y, const std::string &string, font &font, rgba color,
             float *width, float *height)
 {
     if (!font.isLoaded())
         font.load();
 
-    auto fnt               = glez::detail::font::get(font.getHandle()).font;
+
+
     fnt->rendermode        = ftgl::RENDER_NORMAL;
     fnt->outline_thickness = 0.0f;
     internal_draw_string(x, y, string, fnt, color, width, height);

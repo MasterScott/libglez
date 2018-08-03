@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <vertex-buffer.hpp>
+#include "vertex-buffer.hpp"
+#include "render.hpp"
 
 namespace glez::detail::program
 {
@@ -30,5 +31,5 @@ void end();
 
 unsigned next_index();
 
-extern ftgl::vertex_buffer_t *buffer;
+extern ftgl::VertexBuffer<glez::detail::render::vertex> buffer;
 };

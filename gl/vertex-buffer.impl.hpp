@@ -196,7 +196,7 @@ void VertexBuffer<Vertex>::render_setup(GLenum mode)
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        if (!incides.empty())
+        if (!indices.empty())
         {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_id);
         }
@@ -460,6 +460,21 @@ void VertexBuffer<Vertex>::erase(size_t index)
     erase_vertices(vstart, vstart + vcount);
     items.erase(items.begin() + index);
     state = DIRTY;
+}
+
+template<typename Vertex>
+void VertexBuffer<Vertex>::render_items(size_t start, size_t count)
+{
+    render_setup(mode);
+    if (!indices.empty())
+    {
+        glDrawElements(mode, count, GL_UNSIGNED_INT, start * sizeof(GLuint));
+    }
+    else
+    {
+        glDrawArrays(mode, start, count);
+    }
+    render_finish();
 }
 
 }

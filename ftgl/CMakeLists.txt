@@ -1,27 +1,16 @@
 target_sources(glez PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/distance-field.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/edtaa3func.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/font-manager.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/freetype-gl.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/markup.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/mat4.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/opengl.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/text-buffer.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/texture-atlas.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/texture-font.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/utf8-utils.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/vec234.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/vertex-attribute.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/vertex-buffer.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/utf8-utils.hpp")
     
 target_sources(glez PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/distance-field.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/edtaa3func.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/font-manager.cpp"
 #        "${CMAKE_CURRENT_LIST_DIR}/makefont.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/text-buffer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/texture-atlas.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/texture-font.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/utf8-utils.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/vertex-attribute.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/vertex-buffer.impl.hpp")
+        "${CMAKE_CURRENT_LIST_DIR}/utf8-utils.cpp")

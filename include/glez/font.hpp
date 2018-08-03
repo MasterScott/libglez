@@ -21,16 +21,31 @@ public:
 
     inline bool isLoaded() const
     {
-        return !error && pointer;
+        return loaded;
     }
 
     void stringSize(const std::string &string, float *width, float *height);
 
-    const float size;
-protected:
     void load();
 
-    bool error{ false };
+    detail::font::font *getFont();
+
+    const float size;
+protected:
+
+    struct source_type
+    {
+        enum mode_enum
+        {
+            PATH,
+            FAMILY
+        } mode;
+        std::string string;
+        bool bold;
+        bool italic;
+    } source;
+
     std::unique_ptr<detail::font::font> pointer{ nullptr };
+    bool loaded{ false };
 };
 }
