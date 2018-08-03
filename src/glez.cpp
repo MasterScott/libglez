@@ -6,7 +6,6 @@
 #include <glez/detail/program.hpp>
 #include <glez/detail/render.hpp>
 #include <glez/detail/texture.hpp>
-#include <glez/record.hpp>
 #include <glez/glez.hpp>
 
 namespace glez
@@ -27,16 +26,6 @@ void shutdown()
 void resize(int width, int height)
 {
     detail::program::resize(width, height);
-}
-
-void begin()
-{
-    detail::render::begin();
-}
-
-void end()
-{
-    detail::render::end();
 }
 
 }

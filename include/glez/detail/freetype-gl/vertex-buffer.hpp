@@ -63,7 +63,6 @@ public:
      * @param  count amount of items to be rendered
      */
     virtual void render_items(size_t start, size_t count) = 0;
-
 };
 
 /**

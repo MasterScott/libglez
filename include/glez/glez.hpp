@@ -7,12 +7,8 @@
 
 namespace glez
 {
-
 void init(int width, int height);
 void shutdown();
-
 void resize(int width, int height);
 
-void begin();
-void end();
 };

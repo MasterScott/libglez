@@ -6,4 +6,5 @@ target_sources(glez PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/texture-font.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/utf8-utils.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/vertex-attribute.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/vertex-buffer.cpp"
         )
