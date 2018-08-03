@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "font-manager.hpp"
+#include "glez/detail/freetype-gl/font-manager.hpp"
 
 namespace ftgl
 {

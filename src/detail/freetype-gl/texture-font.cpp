@@ -14,8 +14,8 @@
 #include <assert.h>
 #include <math.h>
 #include "distance-field.hpp"
-#include "texture-font.hpp"
-#include "utf8-utils.hpp"
+#include "glez/detail/freetype-gl/texture-font.hpp"
+#include "glez/detail/freetype-gl/utf8-utils.hpp"
 #include <stdexcept>
 
 #define HRES 64

@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 #include <cassert>
-#include <font-manager.hpp>
+#include <glez/detail/freetype-gl/font-manager.hpp>
 
 static std::unique_ptr<ftgl::FontManager> manager{};
 static bool init_done{ false };

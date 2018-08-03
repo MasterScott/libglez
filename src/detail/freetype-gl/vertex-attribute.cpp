@@ -7,8 +7,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "vec234.hpp"
-#include "vertex-attribute.hpp"
+#include "glez/detail/freetype-gl/vec234.hpp"
+#include "glez/detail/freetype-gl/vertex-attribute.hpp"
 
 namespace ftgl
 {

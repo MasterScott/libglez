@@ -3,7 +3,7 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <freetype-gl.hpp>
+#include <glez/detail/freetype-gl/freetype-gl.hpp>
 #include "../vertex-buffer.hpp"
 #include "../mat4.hpp"
 #include <glez/detail/program.hpp>

@@ -7,7 +7,7 @@
 #include <glez/font.hpp>
 #include <glez/detail/render.hpp>
 #include <glez/detail/program.hpp>
-#include "vertex-buffer.hpp"
+#include "glez/detail/freetype-gl/vertex-buffer.hpp"
 #include <glez/detail/font.hpp>
 #include <cstring>
 #include <glez/detail/texture.hpp>

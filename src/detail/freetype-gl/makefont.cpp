@@ -5,7 +5,7 @@
  */
 #include "opengl.hpp"
 #include "vec234.hpp"
-#include "freetype-gl.hpp"
+#include "glez/detail/freetype-gl/freetype-gl.hpp"
 
 #include <errno.h>
 #include <stdio.h>

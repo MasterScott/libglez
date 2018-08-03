@@ -8,7 +8,7 @@
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
-#include "texture-atlas.hpp"
+#include "glez/detail/freetype-gl/texture-atlas.hpp"
 
 namespace ftgl
 {

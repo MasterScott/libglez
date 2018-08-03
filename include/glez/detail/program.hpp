@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "vertex-buffer.hpp"
+#include "glez/detail/freetype-gl/vertex-buffer.hpp"
 #include "render.hpp"
 
 namespace glez::detail::program

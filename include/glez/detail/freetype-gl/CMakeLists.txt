@@ -1,0 +1,15 @@
+target_sources(glez PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/font-manager.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/freetype-gl.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/markup.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/mat4.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/opengl.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/text-buffer.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/texture-atlas.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/texture-font.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/utf8-utils.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/vec234.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/vertex-attribute.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/vertex-buffer.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/vertex-buffer.impl.hpp"
+        )

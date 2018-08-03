@@ -10,8 +10,8 @@
 #include <assert.h>
 #include <math.h>
 #include "opengl.hpp"
-#include "text-buffer.hpp"
-#include "utf8-utils.hpp"
+#include "glez/detail/freetype-gl/text-buffer.hpp"
+#include "glez/detail/freetype-gl/utf8-utils.hpp"
 
 namespace ftgl
 {

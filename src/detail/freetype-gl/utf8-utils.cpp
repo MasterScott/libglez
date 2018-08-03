@@ -4,7 +4,7 @@
  * file `LICENSE` for more details.
  */
 #include <string.h>
-#include "utf8-utils.hpp"
+#include "glez/detail/freetype-gl/utf8-utils.hpp"
 
 namespace ftgl
 {
