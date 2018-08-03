@@ -3,12 +3,10 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <glez/draw.hpp>
-#include <glez/font.hpp>
+#include <glez/Font.hpp>
 #include <glez/detail/render.hpp>
 #include <glez/detail/program.hpp>
 #include "glez/detail/freetype-gl/vertex-buffer.hpp"
-#include <glez/detail/font.hpp>
 #include <cstring>
 #include <glez/detail/texture.hpp>
 #include <cmath>
@@ -19,7 +17,7 @@ namespace indices
 static GLuint rectangle[6] = { 0, 1, 2, 2, 3, 0 };
 }
 
-void internal_draw_string(float x, float y, const std::string &string,
+/*void internal_draw_string(float x, float y, const std::string &string,
                           ftgl::TextureFont& fnt, glez::rgba color, float *width,
                           float *height)
 {
@@ -100,7 +98,7 @@ void internal_draw_string(float x, float y, const std::string &string,
         *width = int(pen_x - x);
     if (height)
         *height = int(size_y);
-}
+}*/
 
 namespace glez::draw
 {
@@ -177,35 +175,33 @@ void rect_outline(float x, float y, float w, float h, rgba color, float thicknes
     rect(x, y + h - 1, w, 1, color);
 }
 
-void string(float x, float y, const std::string &string, font &font, rgba color,
+/*void string(float x, float y, const std::string &string, Font &font, rgba color,
             float *width, float *height)
 {
     if (!font.isLoaded())
         font.load();
 
 
-
-    fnt->rendermode        = ftgl::RENDER_NORMAL;
-    fnt->outline_thickness = 0.0f;
-    internal_draw_string(x, y, string, fnt, color, width, height);
+    font.getFont()->texture->rendermode = ftgl::RENDER_NORMAL;
+    font.getFont()->texture->outline_thickness = 0.0f;
+    internal_draw_string(x, y, string, *font.getFont()->texture.get(), color, width, height);
 }
 
-void outlined_string(float x, float y, const std::string &string, font &font,
+void outlined_string(float x, float y, const std::string &string, Font &font,
                      rgba color, rgba outline, float *width, float *height)
 {
     if (!font.isLoaded())
         font.load();
 
-    auto fnt               = glez::detail::font::get(font.getHandle()).font;
-    fnt->rendermode        = ftgl::RENDER_OUTLINE_POSITIVE;
-    fnt->outline_thickness = 1.0f;
-    internal_draw_string(x, y, string, fnt, outline, width, height);
-    fnt->rendermode        = ftgl::RENDER_NORMAL;
-    fnt->outline_thickness = 0.0f;
-    internal_draw_string(x, y, string, fnt, color, width, height);
-}
+    font.getFont()->texture->rendermode = ftgl::RENDER_OUTLINE_POSITIVE;
+    font.getFont()->texture->outline_thickness = 1.0f;
+    internal_draw_string(x, y, string, *font.getFont()->texture.get(), outline, width, height);
+    font.getFont()->texture->rendermode = ftgl::RENDER_NORMAL;
+    font.getFont()->texture->outline_thickness = 0.0f;
+    internal_draw_string(x, y, string, *font.getFont()->texture.get(), color, width, height);
+}*/
 
-void rect_textured(float x, float y, float w, float h, rgba color, texture &texture,
+/*void rect_textured(float x, float y, float w, float h, rgba color, texture &texture,
                    float tx, float ty, float tw, float th, float angle)
 {
     if (!texture.isLoaded())
@@ -257,10 +253,6 @@ void rect_textured(float x, float y, float w, float h, rgba color, texture &text
     vertices[2].uv = { s1, t1 };
     vertices[3].uv = { s1, t0 };
 
-    if (detail::record::currentRecord)
-        detail::record::currentRecord->store(vertices, 4, indices::rectangle, 6);
-    else
-        ftgl::vertex_buffer_push_back(detail::program::buffer, vertices, 4,
-                                  indices::rectangle, 6);
-}
+    detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
+}*/
 }

@@ -3,7 +3,6 @@
   Copyright (c) 2018 nullworks. All rights reserved.
 */
 
-#include <glez/detail/font.hpp>
 #include <glez/detail/program.hpp>
 #include <glez/detail/render.hpp>
 #include <glez/detail/texture.hpp>

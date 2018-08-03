@@ -288,7 +288,7 @@ void VertexBuffer<Vertex>::upload()
     size_t vsize, isize;
 
     vsize = vertices.size() * sizeof(Vertex);
-    isize = indices.size() * sizeof(decltype(indices)::value_type);
+    isize = indices.size() * sizeof(typename decltype(indices)::value_type);
 
     // Always upload vertices first such that indices do not point to non
     // existing data (if we get interrupted in between for example).
@@ -468,7 +468,7 @@ void VertexBuffer<Vertex>::render_items(size_t start, size_t count)
     render_setup(mode);
     if (!indices.empty())
     {
-        glDrawElements(mode, count, GL_UNSIGNED_INT, start * sizeof(GLuint));
+        glDrawElements(mode, count, GL_UNSIGNED_INT, (const void *)(start * sizeof(GLuint)));
     }
     else
     {

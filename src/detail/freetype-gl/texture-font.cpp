@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include "distance-field.hpp"
 #include "glez/detail/freetype-gl/texture-font.hpp"
 #include "glez/detail/freetype-gl/utf8-utils.hpp"
 #include <stdexcept>
@@ -208,7 +207,7 @@ bool TextureFont::load_glyph(const char *codepoint)
     // WARNING: We use texture-atlas depth to guess if user wants
     //          LCD subpixel rendering
 
-    if (rendermode != RENDER_NORMAL && rendermode != RENDER_SIGNED_DISTANCE_FIELD)
+    if (rendermode != RENDER_NORMAL)
         flags |= FT_LOAD_NO_BITMAP;
     else
         flags |= FT_LOAD_RENDER;
@@ -238,7 +237,7 @@ bool TextureFont::load_glyph(const char *codepoint)
     FT_Glyph ft_glyph;
     FT_Bitmap ft_bitmap;
 
-    if (rendermode == RENDER_NORMAL || rendermode == RENDER_SIGNED_DISTANCE_FIELD)
+    if (rendermode == RENDER_NORMAL)
     {
         auto slot = (*face)->glyph;
         ft_bitmap = slot->bitmap;
@@ -312,12 +311,6 @@ bool TextureFont::load_glyph(const char *codepoint)
         int bottom;
     } padding = {0, 0, 1, 1};
 
-    if (rendermode == RENDER_SIGNED_DISTANCE_FIELD)
-    {
-        padding.top = 1;
-        padding.left = 1;
-    }
-
     size_t src_w = ft_bitmap.width / atlas.depth;
     size_t src_h = ft_bitmap.rows;
 
@@ -347,13 +340,6 @@ bool TextureFont::load_glyph(const char *codepoint)
         src_ptr += ft_bitmap.pitch;
     }
 
-    if (rendermode == RENDER_SIGNED_DISTANCE_FIELD)
-    {
-        unsigned char *sdf = make_distance_mapb(buffer, tgt_w, tgt_h);
-        delete[] buffer;
-        buffer = sdf;
-    }
-
     atlas.set_region((size_t)x, (size_t)y, tgt_w, tgt_h, buffer, tgt_w * atlas.depth);
 
     delete[] buffer;
@@ -380,7 +366,7 @@ bool TextureFont::load_glyph(const char *codepoint)
 
     glyphs.push_back(std::move(glyph));
 
-    if (rendermode != RENDER_NORMAL && rendermode != RENDER_SIGNED_DISTANCE_FIELD)
+    if (rendermode != RENDER_NORMAL)
         FT_Done_Glyph(ft_glyph);
 
     generate_kerning(*face);

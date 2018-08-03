@@ -6,7 +6,7 @@
 
 #include <GL/glew.h>
 #include <functional>
-#include "../../vertex-buffer.hpp"
+#include "freetype-gl/vertex-buffer.hpp"
 
 namespace glez::detail::drawcmd
 {

@@ -9,40 +9,8 @@
 #include <cassert>
 #include <glez/detail/freetype-gl/font-manager.hpp>
 
-static std::unique_ptr<ftgl::FontManager> manager{};
-static bool init_done{ false };
-
-static void init()
-{
-    manager = std::make_unique<ftgl::FontManager>(1024, 1024, 1);
-    init_done = true;
-}
-
 namespace glez::detail::font
 {
-
-font::~font()
-{
-    if (texture)
-    {
-        manager->delete_font(*texture);
-    }
-    texture.reset(nullptr);
-}
-
-bool font::load(const std::string &path, float size)
-{
-    if (!init_done)
-        init();
-    return internalLoad(manager->get_from_filename(path, size));
-}
-
-bool font::loadFamily(std::string family, float size, bool bold, bool italic)
-{
-    if (!init_done)
-        init();
-    return internalLoad(manager->get_from_description(std::move(family), size, bold, italic));
-}
 
 void font::stringSize(const std::string &string, float *width, float *height)
 {

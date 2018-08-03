@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#include "opengl.hpp"
+#include "glez/detail/freetype-gl/opengl.hpp"
 #include "glez/detail/freetype-gl/text-buffer.hpp"
 #include "glez/detail/freetype-gl/utf8-utils.hpp"
 

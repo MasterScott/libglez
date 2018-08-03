@@ -18,6 +18,7 @@ find_package(PNG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(PNG REQUIRED)
 
+set(CMAKE_CXX_STANDARD 17)
 
 add_library(${PROJECT_NAME} STATIC "")
 

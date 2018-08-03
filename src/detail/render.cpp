@@ -4,10 +4,8 @@
 */
 
 #include <glez/detail/render.hpp>
-#include <glez/detail/font.hpp>
 #include <cstring>
 #include <glez/detail/program.hpp>
-#include <glez/detail/record.hpp>
 
 static GLuint current_texture{ 0 };
 
@@ -59,11 +57,8 @@ void bind(GLuint texture)
 {
     if (current_texture != texture)
     {
-        if (!detail::record::isReplaying)
-        {
-            program::draw();
-            program::reset();
-        }
+        program::draw();
+        program::reset();
         current_texture = texture;
         glBindTexture(GL_TEXTURE_2D, texture);
     }

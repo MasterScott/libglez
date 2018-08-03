@@ -4,8 +4,8 @@
 */
 
 #include <glez/detail/freetype-gl/freetype-gl.hpp>
-#include "../vertex-buffer.hpp"
-#include "../mat4.hpp"
+#include "glez/detail/freetype-gl/vertex-buffer.hpp"
+#include "glez/detail/freetype-gl/mat4.hpp"
 #include <glez/detail/program.hpp>
 #include <cstdio>
 #include <stdexcept>
