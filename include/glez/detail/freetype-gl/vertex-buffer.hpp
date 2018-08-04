@@ -69,7 +69,7 @@ public:
      * @param  start first index of the item array
      * @param  count amount of items to be rendered
      */
-    virtual void render_items(size_t start, size_t count) = 0;
+    virtual void render_range(GLenum mode, size_t start, size_t count) = 0;
 
     /**
      * Upload buffer to GPU memory.
@@ -154,7 +154,7 @@ public:
 
     void render_item(size_t index) final;
 
-    void render_items(size_t start, size_t count) final;
+    void render_range(GLenum mode, size_t start, size_t count) final;
 
     void clear() final;
 

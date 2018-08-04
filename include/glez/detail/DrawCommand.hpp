@@ -15,18 +15,30 @@ struct DrawCmd
 {
     enum type_enum: int
     {
+        END,
         USE_PROGRAM,
         BIND_TEXTURE,
-        DRAW_ARRAYS,
+        BUFFER_RENDER,
         CUSTOM
     };
 
-    int type{ 0 };
+    DrawCmd()
+    {
+        size = sizeof(DrawCmd);
+    }
+
+    type_enum type{ END };
     size_t size{ 0 };
 };
 
 struct DCUseProgram: public DrawCmd
 {
+    DCUseProgram()
+    {
+        type = USE_PROGRAM;
+        size = sizeof(DCUseProgram);
+    }
+
     void execute();
 
     GLuint shader{ 0 };
@@ -34,6 +46,12 @@ struct DCUseProgram: public DrawCmd
 
 struct DCBindTexture: public DrawCmd
 {
+    DCBindTexture()
+    {
+        type = BIND_TEXTURE;
+        size = sizeof(DCBindTexture);
+    }
+
     void execute();
 
     GLuint texture{ 0 };
@@ -41,6 +59,11 @@ struct DCBindTexture: public DrawCmd
 
 struct DCDrawArrays: public DrawCmd
 {
+    DCDrawArrays()
+    {
+        size = sizeof(DCDrawArrays);
+    }
+
     void execute();
 
     GLenum mode{ GL_TRIANGLES };
@@ -50,14 +73,29 @@ struct DCDrawArrays: public DrawCmd
 
 struct DCBufferRender: public DrawCmd
 {
+    explicit DCBufferRender(ftgl::IVertexBuffer *buffer): buffer(buffer)
+    {
+        type = BUFFER_RENDER;
+        size = sizeof(DCBufferRender);
+    }
+
     void execute();
 
-    ftgl::IVertexBuffer *buffer;
+    ftgl::IVertexBuffer *buffer{ nullptr };
+    GLenum mode{ GL_TRIANGLES };
+    GLuint start{ 0 };
+    GLuint count{ 0 };
 };
 
 struct DCCustom: public DrawCmd
 {
     using function_type = void(*)(void *);
+
+    explicit DCCustom(function_type fn): function(fn)
+    {
+        type = CUSTOM;
+        size = sizeof(DCCustom);
+    }
 
     void execute();
 

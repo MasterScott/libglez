@@ -12,11 +12,6 @@ void glez::detail::CommandBuffer::pushCommand(drawcmd::DrawCmd &cmd)
     offset += cmd.size;
 }
 
-void glez::detail::CommandBuffer::reset()
-{
-    offset = 0;
-}
-
 glez::detail::CommandBuffer::CommandBuffer()
 {
     data = std::malloc(capacity);
@@ -37,5 +32,57 @@ void glez::detail::CommandBuffer::reserve(size_t size)
     }
     if (changed)
         data = std::realloc(data, capacity);
+}
+
+void glez::detail::CommandBuffer::render()
+{
+    size_t read_index{ 0 };
+    while (read_index < offset)
+    {
+        auto c = reinterpret_cast<drawcmd::DrawCmd *>((uintptr_t)data + read_index);
+        switch (c->type)
+        {
+        case drawcmd::DrawCmd::END:
+        {
+            return;
+        }
+        case drawcmd::DrawCmd::USE_PROGRAM:
+        {
+            auto cmd = reinterpret_cast<drawcmd::DCUseProgram *>((uintptr_t)data + read_index);
+            cmd->execute();
+            break;
+        }
+        case drawcmd::DrawCmd::BIND_TEXTURE:
+        {
+            auto cmd = reinterpret_cast<drawcmd::DCBindTexture *>((uintptr_t)data + read_index);
+            cmd->execute();
+            break;
+        }
+        case drawcmd::DrawCmd::BUFFER_RENDER:
+        {
+            auto cmd = reinterpret_cast<drawcmd::DCBufferRender *>((uintptr_t)data + read_index);
+            cmd->execute();
+            break;
+        }
+        case drawcmd::DrawCmd::CUSTOM:
+        {
+            auto cmd = reinterpret_cast<drawcmd::DCCustom *>((uintptr_t)data + read_index);
+            cmd->execute();
+            break;
+        }
+        }
+        read_index += c->size;
+    }
+}
+
+void glez::detail::CommandBuffer::end()
+{
+    drawcmd::DrawCmd end_command{};
+    pushCommand(end_command);
+}
+
+void glez::detail::CommandBuffer::begin()
+{
+    offset = 0;
 }
 

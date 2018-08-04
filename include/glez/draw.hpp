@@ -43,12 +43,13 @@ void rect(float x, float y, float w, float h, rgba color);
 void rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne, rgba color_se, rgba color_sw);
 
 /*void line(float x, float y, float dx, float dy, rgba color, float thickness);
-void rect(float x, float y, float w, float h, rgba color);
+
+void line(float x, float y, float dx, float dy, rgba color_begin, rgba color_end, float thickness);
+
 void rect_outline(float x, float y, float w, float h, rgba color, float thickness);
 void circle(float x, float y, float radius, rgba color, float thickness, int steps);
 
 
-void line(float x, float y, float dx, float dy, rgba color_begin, rgba color_end, float thickness);
 
 void rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne, rgba color_se, rgba color_sw);
 
@@ -63,5 +64,9 @@ void circle(float x, float y, float radius_inner, float radius_outer, rgba color
             float *width, float *height);
 void outlined_string(float x, float y, const std::string &string, Font &font,
                      rgba color, rgba outline, float *width, float *height);*/
+
+#if !GLEZ_IMMEDIATE_MODE
+void flushVertexBuffers();
+#endif
 
 }

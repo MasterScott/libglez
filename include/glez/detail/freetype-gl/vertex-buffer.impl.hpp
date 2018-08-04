@@ -17,7 +17,7 @@ namespace ftgl
 {
 
 template<typename Vertex>
-VertexBuffer<Vertex>::VertexBuffer(std::string fmt): format(std::move(fmt))
+VertexBuffer<Vertex>::VertexBuffer(std::string fmt): IVertexBuffer{}, format(std::move(fmt))
 {
     size_t i, index = 0, stride = 0;
     const char *start = 0, *end = 0;
@@ -391,7 +391,7 @@ void VertexBuffer<Vertex>::erase(size_t index)
 }
 
 template<typename Vertex>
-void VertexBuffer<Vertex>::render_items(size_t start, size_t count)
+void VertexBuffer<Vertex>::render_range(GLenum mode, size_t start, size_t count)
 {
     render_setup(mode);
     if (!indices.empty())

@@ -25,6 +25,12 @@ void reset();
  */
 void commit();
 
+#else
+
+void render();
+
+#endif
+
 /**
  * Prepare OpenGL state for rendering
  */
@@ -50,9 +56,5 @@ void bindTexture(GLuint texture);
 void useProgram(GLuint program);
 
 void bindVertexBuffer(ftgl::IVertexBuffer *buffer, GLenum mode);
-
-#else
-// TODO
-#endif
 
 }

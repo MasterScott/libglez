@@ -12,8 +12,13 @@
 #include <cmath>
 #include <glez/draw.hpp>
 #include <glez/Render.hpp>
+#include <glez/detail/VertexDoubleBuffer.hpp>
 
+#if GLEZ_IMMEDIATE_MODE
 static ftgl::VertexBuffer<glez::detail::render::vertex> vertex_buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
+#else
+static glez::detail::VertexDoubleBuffer<glez::detail::render::vertex> vertex_double_buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
+#endif
 
 namespace indices
 {
@@ -156,7 +161,11 @@ namespace glez::draw
 void rect(float x, float y, float w, float h, rgba color)
 {
     render::useProgram(detail::program::shaderIdentity());
+#if GLEZ_IMMEDIATE_MODE
     render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
+#else
+    queue::bindBuffer(*vertex_double_buffer, GL_TRIANGLES);
+#endif
 
     detail::render::vertex vertices[4];
 
@@ -174,11 +183,19 @@ void rect(float x, float y, float w, float h, rgba color)
 #if GLEZ_IMMEDIATE_MODE
     vertex_buffer.push_back(vertices, 4, indices::rectangle, 6);
 #else
-#error Not implemented
+    queue::pushIndices((*vertex_double_buffer)->indices.size(), 6);
+    (*vertex_double_buffer)->push_back(vertices, 4, indices::rectangle, 6);
 #endif
 }
 
-void
+#if !GLEZ_IMMEDIATE_MODE
+void flushVertexBuffers()
+{
+    (*vertex_double_buffer)->clear();
+}
+#endif
+
+/*void
 rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne,
            rgba color_se, rgba color_sw)
 {
@@ -204,7 +221,7 @@ rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne,
 #else
 #error Not implemented
 #endif
-}
+}*/
 
 void rect_outline(float x, float y, float w, float h, rgba color, float thickness)
 {

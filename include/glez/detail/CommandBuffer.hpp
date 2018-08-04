@@ -21,14 +21,18 @@ public:
 
     ~CommandBuffer();
 
+    void render();
 
+    void begin();
+
+    void end();
 
     void pushCommand(drawcmd::DrawCmd& cmd);
 
-    void reset();
-
 protected:
     void reserve(size_t size);
+
+    std::vector<ftgl::IVertexBuffer *> delayed_upload_buffers{};
 
     void *data{ nullptr };
     size_t capacity{ 256 };
