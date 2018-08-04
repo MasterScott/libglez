@@ -49,7 +49,7 @@ void bindTexture(GLuint texture);
  */
 void useProgram(GLuint program);
 
-void bindVertexBuffer(ftgl::IVertexBuffer *buffer);
+void bindVertexBuffer(ftgl::IVertexBuffer *buffer, GLenum mode);
 
 #else
 // TODO

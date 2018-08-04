@@ -20,9 +20,9 @@ VertexAttribute::VertexAttribute(GLchar *name, GLint size, GLenum type,
 {
     assert(size > 0);
 
-    name = (GLchar *) strdup(name);
+    this->name = (GLchar *) strdup(name);
     index = 0xFFFFFFFF;
-    pointer = pointer;
+    this->pointer = pointer;
 }
 
 std::optional<VertexAttribute> VertexAttribute::parse(char *format)

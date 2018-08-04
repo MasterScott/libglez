@@ -29,18 +29,25 @@ class IVertexBuffer
 {
 public:
     /**
+     * Buffer status
+     */
+    static constexpr char CLEAN = 0;
+    static constexpr char DIRTY = 1;
+    static constexpr char FROZEN = 2;
+
+    /**
      * Prepare vertex buffer for render.
      *
      * @param  mode  render mode
      */
-    virtual void render_setup(GLenum mode) = 0;
+    void render_setup(GLenum mode);
 
     /**
      * Finish rendering by setting back modified states
      *
      * @param  self  a vertex buffer
      */
-    virtual void render_finish() = 0;
+    void render_finish();
 
     /**
      * Render vertex buffer.
@@ -65,9 +72,46 @@ public:
     virtual void render_items(size_t start, size_t count) = 0;
 
     /**
+     * Upload buffer to GPU memory.
+     */
+    virtual void upload() = 0;
+
+    /**
      * Clear all items.
      */
     virtual void clear() = 0;
+
+#ifdef FREETYPE_GL_USE_VAO
+    /** GL identity of the Vertex Array Object */
+    GLuint VAO_id;
+#endif
+
+    /** GL identity of the vertices buffer. */
+    GLuint vertices_id{ 0 };
+
+    /** Vector of indices. */
+    std::vector<GLuint> indices{};
+
+    /** GL identity of the indices buffer. */
+    GLuint indices_id{ 0 };
+
+    /** Current size of the vertices buffer in GPU */
+    size_t GPU_vsize{ 0 };
+
+    /** Current size of the indices buffer in GPU*/
+    size_t GPU_isize{ 0 };
+
+    /** GL primitives to render. */
+    GLenum mode{ GL_TRIANGLES };
+
+    /** Whether the vertex buffer needs to be uploaded to GPU memory. */
+    char state{ DIRTY };
+
+    /** Individual items */
+    std::vector<ivec4> items{};
+
+    /** Array of attributes. */
+    std::vector<VertexAttribute> attributes{};
 };
 
 /**
@@ -80,13 +124,6 @@ public:
     using vertex_type = Vertex;
 
     static_assert(std::is_pod<Vertex>::value);
-
-    /**
-     * Buffer status
-     */
-    static constexpr char CLEAN = 0;
-    static constexpr char DIRTY = 1;
-    static constexpr char FROZEN = 2;
 
     /**
      * Creates an empty vertex buffer.
@@ -113,10 +150,6 @@ public:
      */
     void print();
 
-    void render_setup(GLenum mode) final;
-
-    void render_finish() final;
-
     void render(GLenum mode) final;
 
     void render_item(size_t index) final;
@@ -125,10 +158,7 @@ public:
 
     void clear() final;
 
-    /**
-     * Upload buffer to GPU memory.
-     */
-    void upload();
+    void upload() final;
 
     /**
      * Appends indices at the end of the buffer.
@@ -229,38 +259,6 @@ public:
 
     /** Vector of vertices. */
     std::vector<Vertex> vertices{};
-
-#ifdef FREETYPE_GL_USE_VAO
-    /** GL identity of the Vertex Array Object */
-    GLuint VAO_id;
-#endif
-
-    /** GL identity of the vertices buffer. */
-    GLuint vertices_id{ 0 };
-
-    /** Vector of indices. */
-    std::vector<GLuint> indices{};
-
-    /** GL identity of the indices buffer. */
-    GLuint indices_id{ 0 };
-
-    /** Current size of the vertices buffer in GPU */
-    size_t GPU_vsize{ 0 };
-
-    /** Current size of the indices buffer in GPU*/
-    size_t GPU_isize{ 0 };
-
-    /** GL primitives to render. */
-    GLenum mode{ GL_TRIANGLES };
-
-    /** Whether the vertex buffer needs to be uploaded to GPU memory. */
-    char state{ DIRTY };
-
-    /** Individual items */
-    std::vector<ivec4> items{};
-
-    /** Array of attributes. */
-    std::vector<VertexAttribute> attributes{};
 };
 
 /** @} */

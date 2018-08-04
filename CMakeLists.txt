@@ -23,8 +23,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_library(${PROJECT_NAME} STATIC "")
 
 target_compile_definitions(glez PRIVATE
-        _GLIBCXX_USE_CXX11_ABI=0
-        FREETYPE_GL_USE_VAO=1)
+        _GLIBCXX_USE_CXX11_ABI=0)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32" CXX_STANDARD 17)
 

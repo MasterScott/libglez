@@ -31,11 +31,12 @@ void glez::render::useProgram(GLuint program)
     }
 }
 
-void glez::render::bindVertexBuffer(ftgl::IVertexBuffer *buffer)
+void glez::render::bindVertexBuffer(ftgl::IVertexBuffer *buffer, GLenum mode)
 {
-    if (render_state.buffer != buffer)
+    if (render_state.buffer != buffer || render_state.mode != mode)
     {
         commit();
+        render_state.mode = mode;
         render_state.buffer = buffer;
         render_state.buffer->clear();
     }

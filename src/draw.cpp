@@ -156,7 +156,7 @@ namespace glez::draw
 void rect(float x, float y, float w, float h, rgba color)
 {
     render::useProgram(detail::program::shaderIdentity());
-    render::bindVertexBuffer(&vertex_buffer);
+    render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
 
     detail::render::vertex vertices[4];
 
@@ -183,7 +183,7 @@ rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne,
            rgba color_se, rgba color_sw)
 {
     render::useProgram(detail::program::shaderIdentity());
-    render::bindVertexBuffer(&vertex_buffer);
+    render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
 
     detail::render::vertex vertices[4];
 
