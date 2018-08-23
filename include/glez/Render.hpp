@@ -8,6 +8,7 @@
 #include <glez/color.hpp>
 #include <glez/detail/freetype-gl/vertex-buffer.hpp>
 #include <glez/Font.hpp>
+#include "Texture.hpp"
 
 namespace glez::render
 {
@@ -50,6 +51,10 @@ void glStateRestore();
  */
 void bindTexture(GLuint texture);
 
+void bindTexture(Texture& texture);
+
+void bindTexture(ftgl::TextureAtlas& atlas);
+
 /**
  * Bind a GL shader if needed
  * Works in similar way to bindTexture
@@ -58,7 +63,5 @@ void bindTexture(GLuint texture);
 void useProgram(GLuint program);
 
 void bindVertexBuffer(ftgl::IVertexBuffer *buffer, GLenum mode);
-
-void bindTextureAtlas(ftgl::TextureAtlas& atlas);
 
 }

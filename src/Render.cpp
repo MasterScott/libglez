@@ -9,19 +9,7 @@ static struct RenderState {
     GLenum mode{ GL_TRIANGLES };
     GLuint program{ 0 };
     ftgl::IVertexBuffer *buffer{ nullptr };
-    ftgl::TextureAtlas *atlas{ nullptr };
 } render_state{};
-
-void glez::render::bindTexture(GLuint texture)
-{
-    if (render_state.texture != texture)
-    {
-        commit();
-        glBindTexture(GL_TEXTURE_2D, texture);
-        render_state.texture = texture;
-        render_state.atlas = nullptr;
-    }
-}
 
 void glez::render::useProgram(GLuint program)
 {
@@ -78,16 +66,25 @@ void glez::render::glStateRestore()
     glPopAttrib();
 }
 
-void glez::render::bindTextureAtlas(ftgl::TextureAtlas &atlas)
+void glez::render::bindTexture(GLuint texture)
 {
-    if (render_state.atlas != &atlas)
+    if (render_state.texture != texture)
+    {
+        commit();
+        glBindTexture(GL_TEXTURE_2D, texture);
+        render_state.texture = texture;
+    }
+}
+
+void glez::render::bindTexture(ftgl::TextureAtlas &atlas)
+{
+    if (render_state.texture != atlas.id)
     {
         commit();
         if (atlas.dirty)
             atlas.upload();
         glBindTexture(GL_TEXTURE_2D, atlas.id);
-        render_state.atlas = &atlas;
-        render_state.texture = 0;
+        render_state.texture = atlas.id;
     }
 }
 
@@ -119,6 +116,16 @@ void glez::render::reset()
     if (render_state.buffer)
     {
         render_state.buffer->clear();
+    }
+}
+
+void glez::render::bindTexture(Texture &texture)
+{
+    if (render_state.texture != texture.getTexture() || !texture.isUploaded())
+    {
+        commit();
+        texture.bind();
+        render_state.texture = texture.getTexture();
     }
 }
 

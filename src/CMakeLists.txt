@@ -3,6 +3,7 @@ target_sources(glez PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/glez.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Font.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/Render.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/Texture.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/shader.cpp")
 
 add_subdirectory(detail)

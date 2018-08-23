@@ -8,6 +8,7 @@
 #include <string>
 #include "color.hpp"
 #include "Font.hpp"
+#include "Texture.hpp"
 
 namespace glez::draw
 {
@@ -43,6 +44,8 @@ void rect(float x, float y, float w, float h, rgba color);
 void rect(float x, float y, float w, float h, rgba color_nw, rgba color_ne, rgba color_se, rgba color_sw);
 
 void rect_outline(float x, float y, float w, float h, rgba color, float thickness);
+
+void rect_textured(float x, float y, float w, float h, rgba color, Texture& texture, float tx, float ty, float tw, float th, float angle);
 
 void string(float x, float y, std::string_view string, Font& font, rgba color);
 

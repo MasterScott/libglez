@@ -29,7 +29,7 @@ static void internal_string(float x, float y, std::string_view string, ftgl::Tex
 {
     glez::render::useProgram(glez::detail::program::shaderIdentity());
     glez::render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
-    glez::render::bindTextureAtlas(font.atlas);
+    glez::render::bindTexture(font.atlas);
 
     glez::render::vertex vertices[string.size() * 4];
     GLuint indices[string.size() * 6];
@@ -249,19 +249,15 @@ circle(float x, float y, float radius_inner, float radius_outer, rgba color)
     circle_buffer.push_back(vertices, 4, indices::rectangle, 6);
 }
 
-/*void rect_textured(float x, float y, float w, float h, rgba color, texture &texture,
-                   float tx, float ty, float tw, float th, float angle)
+void
+rect_textured(float x, float y, float w, float h, rgba color, Texture &texture,
+              float tx, float ty, float tw, float th, float angle)
 {
-    if (!texture.isLoaded())
-        texture.load();
+    render::useProgram(detail::program::shaderIdentity());
+    render::bindTexture(texture);
+    render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
 
-    auto &tex = detail::texture::get(texture.getHandle());
-    if (glez::detail::record::currentRecord)
-        glez::detail::record::currentRecord->bindTexture(&tex);
-    else
-        tex.bind();
-
-    detail::render::vertex vertices[4];
+    render::vertex vertices[4];
 
     for (auto &vertex : vertices)
     {
@@ -285,9 +281,9 @@ circle(float x, float y, float radius_inner, float radius_outer, rgba color)
             float oy = v.position.y;
 
             v.position.x =
-                cx + cosf(angle) * (ox - cx) - sinf(angle) * (oy - cy);
+                    cx + cosf(angle) * (ox - cx) - sinf(angle) * (oy - cy);
             v.position.y =
-                cy + sinf(angle) * (ox - cx) + cosf(angle) * (oy - cy);
+                    cy + sinf(angle) * (ox - cx) + cosf(angle) * (oy - cy);
         }
     }
 
@@ -301,6 +297,7 @@ circle(float x, float y, float radius_inner, float radius_outer, rgba color)
     vertices[2].uv = { s1, t1 };
     vertices[3].uv = { s1, t0 };
 
-    detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
-}*/
+    vertex_buffer.push_back(vertices, 4, indices::rectangle, 6);
+}
+
 }
