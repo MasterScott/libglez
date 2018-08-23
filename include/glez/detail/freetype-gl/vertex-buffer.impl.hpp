@@ -167,16 +167,10 @@ void VertexBuffer<Vertex>::print()
 template<typename Vertex>
 void VertexBuffer<Vertex>::render(GLenum mode)
 {
+    if (indices.empty())
+        return;
     render_setup(mode);
-
-    if (!indices.empty())
-    {
-        glDrawElements(mode, indices.size(), GL_UNSIGNED_INT, nullptr);
-    }
-    else
-    {
-        glDrawArrays(mode, 0, vertices.size());
-    }
+    glDrawElements(mode, indices.size(), GL_UNSIGNED_INT, nullptr);
     render_finish();
 }
 

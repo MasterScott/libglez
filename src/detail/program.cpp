@@ -48,7 +48,8 @@ void main()
            gl_FragColor = frag_Color * tex;
        else if (frag_DrawMode == 3)
        {
-           gl_FragColor = vec4(frag_Color.rgb, frag_Color.a * tex.r);
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            gl_FragColor = vec4(frag_Color.rgb, frag_Color.a * tex.r);
        }
        else
            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);

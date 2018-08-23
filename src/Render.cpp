@@ -116,10 +116,9 @@ void glez::render::end()
 
 void glez::render::reset()
 {
-    // TODO
     if (render_state.buffer)
     {
-        // clear the buffer
+        render_state.buffer->clear();
     }
 }
 

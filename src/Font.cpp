@@ -12,7 +12,7 @@ static bool isManagerReady{ false };
 
 static void initManager()
 {
-    manager = std::make_unique<ftgl::FontManager>(1024, 1024, 1);
+    manager = std::make_unique<ftgl::FontManager>(64, 64, 1);
     isManagerReady = true;
 }
 

@@ -154,11 +154,9 @@ void TextureAtlas::set_region(size_t x, size_t y, size_t width, size_t height,
     assert(y < (this->height - 1));
     assert((y + height) <= (this->height - 1));
 
-    size_t i{ 0 };
-
-    for (i = 0; i < height; ++i)
+    for (auto i = 0u; i < height; ++i)
     {
-        memcpy(&this->data[((y + i) * width + x) * depth],
+        memcpy(&this->data[((y + i) * this->width + x) * depth],
                &data[(i * stride)], width * depth);
     }
 
@@ -191,6 +189,14 @@ void TextureAtlas::upload()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    for (int i = 0; i < height; ++i)
+    {
+        for (int j = 0; j < width; ++j)
+        {
+            printf("%02hhX ", data[i * width + j]);
+        }
+        printf("\n");
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
     dirty = false;

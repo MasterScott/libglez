@@ -15,8 +15,9 @@ static ftgl::VertexBuffer<glez::render::vertex> vertex_buffer{ "vertex:2f,tex_co
 
 static void internal_string(float x, float y, std::string_view string, ftgl::TextureFont& font, glez::rgba color)
 {
-    glez::render::bindTextureAtlas(font.atlas);
+    glez::render::useProgram(glez::detail::program::shaderIdentity());
     glez::render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
+    glez::render::bindTextureAtlas(font.atlas);
 
     glez::render::vertex vertices[string.size() * 4];
     GLuint indices[string.size() * 6];
