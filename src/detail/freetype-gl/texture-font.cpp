@@ -37,24 +37,33 @@ const struct
 } FT_Errors[] =
 #include FT_ERRORS_H
 
+static FT_Library library{ nullptr };
+
 class FreeTypeRAII
 {
 public:
-    explicit FreeTypeRAII(FT_Library *handle): handle(handle)
+    static size_t count;
+
+    explicit FreeTypeRAII()
     {
-        FT_Init_FreeType(handle);
+        if (!count)
+        {
+            FT_Init_FreeType(&library);
+        }
+        ++count;
     }
 
     ~FreeTypeRAII()
     {
-        FT_Done_FreeType(*handle);
+        if (count == 1)
+        {
+            FT_Done_FreeType(library);
+        }
+        --count;
     }
-
-    FT_Library *handle;
 };
 
-static FT_Library library{ nullptr };
-static FreeTypeRAII ft_raii{ &library };
+size_t FreeTypeRAII::count = 0;
 
 class FaceRAII
 {
@@ -164,6 +173,8 @@ TextureGlyph *TextureFont::find_glyph(const char *codepoint)
 
 bool TextureFont::load_glyph(const char *codepoint)
 {
+    FreeTypeRAII ft_raii{};
+
     FaceRAII face(load_face(size));
     if (*face == nullptr)
         return false;
@@ -432,6 +443,8 @@ void TextureFont::enlarge_atlas(size_t width_new, size_t height_new)
 
 bool TextureFont::init()
 {
+    FreeTypeRAII ft_raii{};
+
     if (size <= 0)
         return false;
 
@@ -476,7 +489,6 @@ bool TextureFont::init()
     height = (metrics.height >> 6) / 100.0;
     linegap = height - ascender + descender;
     FT_Done_Face(face);
-    FT_Done_FreeType(library);
 
     /* NULL is a special glyph */
     get_glyph(nullptr);
@@ -486,6 +498,8 @@ bool TextureFont::init()
 
 FT_Face TextureFont::load_face(float size)
 {
+    FreeTypeRAII ft_raii{};
+
     FT_Matrix matrix = {(int) ((1.0 / HRES) * 0x10000L),
                         (int) ((0.0) * 0x10000L), (int) ((0.0) * 0x10000L),
                         (int) ((1.0) * 0x10000L)};

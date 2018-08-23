@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include <GL/glew.h>
 
 #include "vec234.hpp"
 
@@ -121,6 +122,8 @@ public:
      */
     void clear();
 
+    void upload();
+
     /**
      * Allocated nodes
      */
@@ -157,10 +160,15 @@ public:
     unsigned char *data;
 
     /**
-     * Custom field
+     * Does the atlas need re-uploading
      */
     char dirty{ 1 };
 
+    GLint internal_format{ GL_RGBA8 };
+
+    GLenum format{ GL_RGBA };
+
+    GLint filter{ GL_LINEAR };
 };
 
 /** @} */

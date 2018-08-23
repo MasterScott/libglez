@@ -18,7 +18,7 @@ static void initManager()
 
 glez::Font::Font(std::string filename, float size): size(size)
 {
-    loader = [filename = std::move(filename), size]() -> ftgl::TextureFont * {
+    loader = [filename, size]() -> ftgl::TextureFont * {
         return manager->get_from_filename(filename, size);
     };
 }
@@ -50,6 +50,8 @@ void glez::Font::prepare()
 
 bool glez::Font::load()
 {
+    if (!isManagerReady)
+        initManager();
     font = loader();
     return font != nullptr;
 }

@@ -5,12 +5,20 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <glez/color.hpp>
 #include <glez/detail/freetype-gl/vertex-buffer.hpp>
+#include <glez/Font.hpp>
 
 namespace glez::render
 {
 
-#if GLEZ_IMMEDIATE_MODE
+struct vertex
+{
+    ftgl::vec2 position;
+    ftgl::vec2 uv;
+    glez::rgba color;
+    int mode;
+};
 
 void begin();
 void end();
@@ -24,12 +32,6 @@ void reset();
  * Render current vertex array
  */
 void commit();
-
-#else
-
-void render();
-
-#endif
 
 /**
  * Prepare OpenGL state for rendering
@@ -56,5 +58,7 @@ void bindTexture(GLuint texture);
 void useProgram(GLuint program);
 
 void bindVertexBuffer(ftgl::IVertexBuffer *buffer, GLenum mode);
+
+void bindTextureAtlas(ftgl::TextureAtlas& atlas);
 
 }

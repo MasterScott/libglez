@@ -5,8 +5,8 @@
 
 #pragma once
 
+#include <glez/Render.hpp>
 #include "glez/detail/freetype-gl/vertex-buffer.hpp"
-#include "render.hpp"
 
 namespace glez::detail::program
 {
@@ -33,5 +33,5 @@ GLuint shaderIdentity();
 
 unsigned next_index();
 
-extern ftgl::VertexBuffer<glez::detail::render::vertex> buffer;
+extern ftgl::VertexBuffer<glez::render::vertex> buffer;
 };

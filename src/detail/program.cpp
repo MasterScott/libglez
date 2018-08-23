@@ -61,7 +61,7 @@ static GLuint shader_identity{};
 namespace glez::detail::program
 {
 
-ftgl::VertexBuffer<glez::detail::render::vertex> buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
+ftgl::VertexBuffer<glez::render::vertex> buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
 
 void resize(int width, int height)
 {

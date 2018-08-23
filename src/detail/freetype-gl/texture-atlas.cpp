@@ -8,6 +8,9 @@
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
+#include <glez/detail/freetype-gl/texture-atlas.hpp>
+#include <GL/glew.h>
+
 #include "glez/detail/freetype-gl/texture-atlas.hpp"
 
 namespace ftgl
@@ -21,7 +24,7 @@ int TextureAtlas::fit(size_t index, size_t width, size_t height)
     auto width_left = width;
     auto i = index;
 
-    if ((x + width) > (width - 1))
+    if ((x + width) > (this->width - 1))
     {
         return -1;
     }
@@ -33,7 +36,7 @@ int TextureAtlas::fit(size_t index, size_t width, size_t height)
         {
             y = node.y;
         }
-        if ((y + height) > (height - 1))
+        if ((y + height) > (this->height - 1))
         {
             return -1;
         }
@@ -180,6 +183,20 @@ void TextureAtlas::clear()
 TextureAtlas::~TextureAtlas()
 {
     delete[] data;
+}
+
+void TextureAtlas::upload()
+{
+    if (id == 0)
+        glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    dirty = false;
 }
 
 }

@@ -4,8 +4,6 @@
 */
 
 #include <glez/detail/program.hpp>
-#include <glez/detail/render.hpp>
-#include <glez/detail/texture.hpp>
 #include <glez/glez.hpp>
 
 namespace glez

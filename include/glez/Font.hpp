@@ -65,7 +65,7 @@ public:
      * The size of the font in points
      */
     const float size;
-protected:
+
     /**
      * Callback to load the font
      */

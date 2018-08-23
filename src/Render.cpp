@@ -10,20 +10,17 @@ static struct RenderState {
     GLenum mode{ GL_TRIANGLES };
     GLuint program{ 0 };
     ftgl::IVertexBuffer *buffer{ nullptr };
+    ftgl::TextureAtlas *atlas{ nullptr };
 } render_state{};
 
 void glez::render::bindTexture(GLuint texture)
 {
     if (render_state.texture != texture)
     {
-#if GLEZ_IMMEDIATE_MODE
         commit();
         glBindTexture(GL_TEXTURE_2D, texture);
-#else
-        queue::commit();
-        queue::bindTexture(texture);
-#endif
         render_state.texture = texture;
+        render_state.atlas = nullptr;
     }
 }
 
@@ -31,13 +28,8 @@ void glez::render::useProgram(GLuint program)
 {
     if (render_state.program != program)
     {
-#if GLEZ_IMMEDIATE_MODE
         commit();
         glUseProgram(program);
-#else
-        queue::commit();
-        queue::useProgram(program);
-#endif
         render_state.program = program;
     }
 }
@@ -46,12 +38,8 @@ void glez::render::bindVertexBuffer(ftgl::IVertexBuffer *buffer, GLenum mode)
 {
     if (render_state.buffer != buffer || render_state.mode != mode)
     {
-#if GLEZ_IMMEDIATE_MODE
         commit();
         buffer->clear();
-#else
-        queue::commit();
-#endif
         render_state.mode = mode;
         render_state.buffer = buffer;
     }
@@ -91,7 +79,15 @@ void glez::render::glStateRestore()
     glPopAttrib();
 }
 
-#if GLEZ_IMMEDIATE_MODE
+void glez::render::bindTextureAtlas(ftgl::TextureAtlas &atlas)
+{
+    if (render_state.atlas != &atlas)
+    {
+        render_state.atlas = &atlas;
+        render_state.texture = 0;
+    }
+}
+
 void glez::render::commit()
 {
     if (render_state.buffer)
@@ -123,7 +119,6 @@ void glez::render::reset()
         // clear the buffer
     }
 }
-#else
 
 #endif
 
