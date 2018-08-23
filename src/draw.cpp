@@ -13,6 +13,18 @@
 
 static ftgl::VertexBuffer<glez::render::vertex> vertex_buffer{ "vertex:2f,tex_coord:2f,color:4f,drawmode:1i" };
 
+struct circle_vertex
+{
+    ftgl::vec2 position;
+    ftgl::vec2 center;
+    float radius_inner;
+    float radius_outer;
+    glez::rgba color;
+};
+
+static ftgl::VertexBuffer<circle_vertex> circle_buffer{ "position:2f,center:2f,radius_inner:1f,radius_outer:1f,color:4f" };
+
+
 static void internal_string(float x, float y, std::string_view string, ftgl::TextureFont& font, glez::rgba color)
 {
     glez::render::useProgram(glez::detail::program::shaderIdentity());
@@ -85,52 +97,6 @@ static GLuint rectangle[6] = { 0, 1, 2, 2, 3, 0 };
 namespace glez::draw
 {
 
-/*void line(float x, float y, float dx, float dy, rgba color, float thickness)
-{
-    // Dirty
-    x += 0.5f;
-    y += 0.5f;
-
-    float length = sqrtf(dx * dx + dy * dy);
-    dx *= (length - 1.0f) / length;
-    dy *= (length - 1.0f) / length;
-
-    detail::render::vertex vertices[4];
-
-    for (auto &vertex : vertices)
-    {
-        vertex.mode  = static_cast<int>(detail::program::mode::PLAIN);
-        vertex.color = color;
-    }
-
-    float nx = dx;
-    float ny = dy;
-
-    float ex = x + dx;
-    float ey = y + dy;
-
-    if (length == 0)
-        return;
-
-    nx /= length;
-    ny /= length;
-
-    float th = thickness;
-
-    nx *= th * 0.5f;
-    ny *= th * 0.5f;
-
-    float px = ny;
-    float py = -nx;
-
-    vertices[2].position = { float(x) - nx + px, float(y) - ny + py };
-    vertices[1].position = { float(x) - nx - px, float(y) - ny - py };
-    vertices[3].position = { ex + nx + px, ey + ny + py };
-    vertices[0].position = { ex + nx - px, ey + ny - py };
-
-    detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
-}*/
-
 void rect(float x, float y, float w, float h, rgba color)
 {
     render::useProgram(detail::program::shaderIdentity());
@@ -185,100 +151,103 @@ void rect_outline(float x, float y, float w, float h, rgba color, float thicknes
     rect(x, y + h - thickness, w, thickness, color);
 }
 
-/*void internal_draw_string(float x, float y, const std::string &string,
-                          ftgl::TextureFont& fnt, glez::rgba color, float *width,
-                          float *height)
-{
-    float pen_x  = x;
-    float pen_y  = y + fnt.height / 1.5f;
-    float size_y = 0;
-
-    const char *sstring = string.c_str();
-
-    for (size_t i = 0; i < string.size(); ++i)
-    {
-        auto glyph = fnt.get_glyph(&sstring[i]);
-        if (glyph == nullptr)
-            continue;
-
-        glez::detail::render::vertex vertices[4];
-        for (auto &vertex : vertices)
-        {
-            vertex.color = color;
-            vertex.mode =
-                static_cast<int>(glez::detail::program::mode::FREETYPE);
-        }
-
-        if (i > 0)
-        {
-            x += glyph->get_kerning(&sstring[i - 1]);
-        }
-
-        const float x0 = (int) (pen_x + glyph->offset_x);
-        const float y0 = (int) (pen_y - glyph->offset_y);
-        const float x1 = (int) (x0 + glyph->width);
-        const float y1 = (int) (y0 + glyph->height);
-        const float s0 = glyph->s0;
-        const float t0 = glyph->t0;
-        const float s1 = glyph->s1;
-        const float t1 = glyph->t1;
-
-        vertices[0].position = { x0, y0 };
-        vertices[0].uv       = { s0, t0 };
-
-        vertices[1].position = { x0, y1 };
-        vertices[1].uv       = { s0, t1 };
-
-        vertices[2].position = { x1, y1 };
-        vertices[2].uv       = { s1, t1 };
-
-        vertices[3].position = { x1, y0 };
-        vertices[3].uv       = { s1, t0 };
-
-        pen_x += glyph->advance_x;
-
-        if (glyph->height > size_y)
-            size_y = glyph->height;
-
-        glez::detail::program::buffer.push_back(vertices, 4, indices::rectangle, 6);
-    }
-
-    if (width)
-        *width = int(pen_x - x);
-    if (height)
-        *height = int(size_y);
-}*/
-
 void string(float x, float y, std::string_view string, Font &font, rgba color)
 {
     internal_string(x, y, string, *font.font, color);
 }
 
-/*void string(float x, float y, const std::string &string, Font &font, rgba color,
-            float *width, float *height)
+void outlined_string(float x, float y, std::string_view string, Font &font,
+                     rgba color, rgba outline)
 {
-    if (!font.isLoaded())
-        font.load();
-
-
-    font.getFont()->texture->rendermode = ftgl::RENDER_NORMAL;
-    font.getFont()->texture->outline_thickness = 0.0f;
-    internal_draw_string(x, y, string, *font.getFont()->texture.get(), color, width, height);
+    font.font->outline_thickness = 1.0f;
+    font.font->rendermode = ftgl::rendermode_t::RENDER_OUTLINE_POSITIVE;
+    internal_string(x, y, string, *font.font, outline);
+    font.font->outline_thickness = 0.0f;
+    font.font->rendermode = ftgl::rendermode_t::RENDER_NORMAL;
+    internal_string(x, y, string, *font.font, color);
 }
 
-void outlined_string(float x, float y, const std::string &string, Font &font,
-                     rgba color, rgba outline, float *width, float *height)
+void line(float x, float y, float dx, float dy, rgba color, float thickness)
 {
-    if (!font.isLoaded())
-        font.load();
+    line(x, y, dx, dy, color, color, thickness);
+}
 
-    font.getFont()->texture->rendermode = ftgl::RENDER_OUTLINE_POSITIVE;
-    font.getFont()->texture->outline_thickness = 1.0f;
-    internal_draw_string(x, y, string, *font.getFont()->texture.get(), outline, width, height);
-    font.getFont()->texture->rendermode = ftgl::RENDER_NORMAL;
-    font.getFont()->texture->outline_thickness = 0.0f;
-    internal_draw_string(x, y, string, *font.getFont()->texture.get(), color, width, height);
-}*/
+void line(float x, float y, float dx, float dy, rgba color_begin,
+                rgba color_end, float thickness)
+{
+    render::useProgram(detail::program::shaderIdentity());
+    render::bindVertexBuffer(&vertex_buffer, GL_TRIANGLES);
+
+    // Dirty
+    x += 0.5f;
+    y += 0.5f;
+
+    float length = sqrtf(dx * dx + dy * dy);
+    dx *= (length - 1.0f) / length;
+    dy *= (length - 1.0f) / length;
+
+    render::vertex vertices[4];
+
+    for (auto &vertex : vertices)
+    {
+        vertex.mode  = static_cast<int>(detail::program::mode::PLAIN);
+    }
+
+    vertices[0].color = color_end;
+    vertices[1].color = color_begin;
+    vertices[2].color = color_begin;
+    vertices[3].color = color_end;
+
+    float nx = dx;
+    float ny = dy;
+
+    float ex = x + dx;
+    float ey = y + dy;
+
+    if (length == 0)
+        return;
+
+    nx /= length;
+    ny /= length;
+
+    float th = thickness;
+
+    nx *= th * 0.5f;
+    ny *= th * 0.5f;
+
+    float px = ny;
+    float py = -nx;
+
+    vertices[2].position = { float(x) - nx + px, float(y) - ny + py };
+    vertices[1].position = { float(x) - nx - px, float(y) - ny - py };
+    vertices[3].position = { ex + nx + px, ey + ny + py };
+    vertices[0].position = { ex + nx - px, ey + ny - py };
+
+    vertex_buffer.push_back(vertices, 4, indices::rectangle, 6);
+}
+
+void
+circle(float x, float y, float radius_inner, float radius_outer, rgba color)
+{
+    render::useProgram(detail::program::circleShader());
+    render::bindVertexBuffer(&circle_buffer, GL_TRIANGLES);
+
+    circle_vertex vertices[4];
+    for (auto& vertex: vertices)
+    {
+        vertex.center = { x, detail::program::getScreenSize().second - y };
+        vertex.radius_inner = radius_inner;
+        vertex.radius_outer = radius_outer;
+        vertex.color = color;
+    }
+
+    vertices[0].position = { x - radius_outer, y - radius_outer };
+    vertices[1].position = { x - radius_outer, y + radius_outer };
+    vertices[2].position = { x + radius_outer, y + radius_outer };
+    vertices[3].position = { x + radius_outer, y - radius_outer };
+
+    circle_buffer.push_back(vertices, 4, indices::rectangle, 6);
+}
 
 /*void rect_textured(float x, float y, float w, float h, rgba color, texture &texture,
                    float tx, float ty, float tw, float th, float angle)

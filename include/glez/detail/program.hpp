@@ -23,15 +23,11 @@ void shutdown();
 
 void resize(int width, int height);
 
-void draw();
-void reset();
-
-void begin();
 void end();
 
 GLuint shaderIdentity();
+GLuint circleShader();
 
-unsigned next_index();
+std::pair<int, int> getScreenSize();
 
-extern ftgl::VertexBuffer<glez::render::vertex> buffer;
 };
