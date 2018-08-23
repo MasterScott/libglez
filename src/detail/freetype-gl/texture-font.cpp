@@ -340,6 +340,7 @@ bool TextureFont::load_glyph(const char *codepoint)
     auto y = region.y;
 
     auto buffer = new unsigned char[tgt_w * tgt_h * atlas.depth];
+    memset(buffer, 0, tgt_w * tgt_h * atlas.depth);
     auto dst_ptr = &buffer[(padding.top * tgt_w + padding.left) * atlas.depth];
     auto src_ptr = ft_bitmap.buffer;
     for (auto i = 0; i < src_h; i++)

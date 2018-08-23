@@ -32,6 +32,7 @@ FontManager::FontManager(size_t width, size_t height, size_t depth): atlas(width
     cache.push_back('\0');
     atlas.internal_format = GL_RED;
     atlas.format = GL_RED;
+    atlas.filter = GL_NEAREST;
 }
 
 void FontManager::delete_font(TextureFont &font)
