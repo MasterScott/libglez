@@ -21,7 +21,7 @@ int TextureAtlas::fit(size_t index, size_t width, size_t height)
     auto node = nodes[index];
     auto x = node.x;
     auto y = node.y;
-    auto width_left = width;
+    int width_left = width;
     auto i = index;
 
     if ((x + width) > (this->width - 1))
@@ -67,12 +67,7 @@ TextureAtlas::TextureAtlas(size_t width, size_t height, size_t depth): width(wid
 {
     assert((depth == 1) || (depth == 3) || (depth == 4));
 
-    // We want a one pixel border around the whole atlas to avoid any artefact
-    // when sampling texture
-
     data = new unsigned char[width * height * depth];
-
-    clear();
 
     if (data == nullptr)
     {
@@ -80,6 +75,8 @@ TextureAtlas::TextureAtlas(size_t width, size_t height, size_t depth): width(wid
                 __LINE__);
         exit(EXIT_FAILURE);
     }
+
+    clear();
 }
 
 ivec4 TextureAtlas::get_region(size_t width, size_t height)

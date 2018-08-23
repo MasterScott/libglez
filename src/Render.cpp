@@ -3,7 +3,6 @@
 */
 
 #include <glez/Render.hpp>
-#include <glez/DrawQueue.hpp>
 
 static struct RenderState {
     GLuint texture{ 0 };
@@ -83,6 +82,10 @@ void glez::render::bindTextureAtlas(ftgl::TextureAtlas &atlas)
 {
     if (render_state.atlas != &atlas)
     {
+        commit();
+        if (atlas.dirty)
+            atlas.upload();
+        glBindTexture(GL_TEXTURE_2D, atlas.id);
         render_state.atlas = &atlas;
         render_state.texture = 0;
     }
@@ -119,6 +122,4 @@ void glez::render::reset()
         // clear the buffer
     }
 }
-
-#endif
 

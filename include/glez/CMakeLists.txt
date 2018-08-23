@@ -3,8 +3,6 @@ target_sources(glez PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/Sprite.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Font.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Render.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/Cache.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/DrawQueue.hpp"
 
         "${CMAKE_CURRENT_LIST_DIR}/color.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/glez.hpp"

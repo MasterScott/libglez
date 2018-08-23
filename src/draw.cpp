@@ -70,7 +70,7 @@ static void internal_string(float x, float y, std::string_view string, ftgl::Tex
         x += glyph->advance_x;
     }
 
-#error not implemented
+    vertex_buffer.push_back(vertices, 4 * string.size(), indices, 6 * string.size());
 }
 
 namespace indices
